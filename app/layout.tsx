@@ -8,7 +8,7 @@ import '@fontsource-variable/playfair-display';
 import '@fontsource-variable/playfair-display/wght-italic.css';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './app.css';
-import './welcome.css';
+import './onboarding.css';
 import PwaRegister from '../components/PwaRegister';
 import { asset } from '../lib/asset';
 import { themeBootScript } from '../lib/themes';
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: 'Glühwein Tour 26',
   description: 'Deine winterliche Glühwein-Tour durch Bielefeld.',
   manifest: asset('/manifest.webmanifest'),
-  icons: { icon: asset('/favicon.svg'), apple: asset('/apple-touch-icon.png') },
+  icons: { icon: asset('/favicon-64.png'), apple: asset('/apple-touch-icon.png') },
   appleWebApp: { capable: true, title: 'Glühwein 26', statusBarStyle: 'black-translucent' },
   formatDetection: { telephone: false },
 };

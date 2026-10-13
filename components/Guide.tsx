@@ -21,14 +21,10 @@ export function ThemePicker({ value, onChange }: { value: string; onChange: (id:
   );
 }
 
-export default function Guide({ theme, onTheme, onClose }: { theme: string; onTheme: (id: string) => void; onClose: () => void }) {
-  const dialog = useRef<HTMLDialogElement>(null);
+/** Läuft die Seite schon als App, und wie kommt sie auf den Home-Bildschirm? */
+export function useInstall() {
   const [env, setEnv] = useState({ ios: false, android: false, standalone: false, canInstall: false });
-  const [geo, setGeo] = useState<'idle' | 'asking' | 'ok' | 'denied'>('idle');
   useEffect(() => {
-    const el = dialog.current, overflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    if (el && !el.open) el.showModal();
     const ua = navigator.userAgent;
     setEnv({
       ios: /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1),
@@ -36,8 +32,6 @@ export default function Guide({ theme, onTheme, onClose }: { theme: string; onTh
       standalone: matchMedia('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone === true,
       canInstall: !!deferredInstall,
     });
-    navigator.permissions?.query({ name: 'geolocation' as PermissionName }).then(p => { if (p.state === 'granted') setGeo('ok'); if (p.state === 'denied') setGeo('denied'); }).catch(() => {});
-    return () => { el?.close(); document.body.style.overflow = overflow; };
   }, []);
   async function install() {
     if (!deferredInstall) return;
@@ -46,6 +40,28 @@ export default function Guide({ theme, onTheme, onClose }: { theme: string; onTh
     deferredInstall = null;
     setEnv(e => ({ ...e, canInstall: false, standalone: outcome === 'accepted' }));
   }
+  return { env, install };
+}
+
+export function InstallHint({ env, install }: ReturnType<typeof useInstall>) {
+  return env.standalone ? <p><Check size={14} /> Läuft bereits als App.</p>
+    : env.ios ? <p>In Safari unten auf <Share size={14} className="inline-icon" /> <b>Teilen</b> tippen, dann <b>„Zum Home-Bildschirm“</b> und <b>Hinzufügen</b>.</p>
+    : env.canInstall ? <><p>Mit einem Tipp als App installieren.</p><button type="button" className="btn primary small" onClick={install}>App installieren</button></>
+    : env.android ? <p>Im Chrome-Menü <b>⋮</b> auf <b>„App installieren“</b> oder <b>„Zum Startbildschirm“</b> tippen.</p>
+    : <p>Öffne den Link am Handy: iPhone mit Safari, Android mit Chrome.</p>;
+}
+
+export default function Guide({ theme, onTheme, onClose }: { theme: string; onTheme: (id: string) => void; onClose: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const inst = useInstall(), { env } = inst;
+  const [geo, setGeo] = useState<'idle' | 'asking' | 'ok' | 'denied'>('idle');
+  useEffect(() => {
+    const el = dialog.current, overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    if (el && !el.open) el.showModal();
+    navigator.permissions?.query({ name: 'geolocation' as PermissionName }).then(p => { if (p.state === 'granted') setGeo('ok'); if (p.state === 'denied') setGeo('denied'); }).catch(() => {});
+    return () => { el?.close(); document.body.style.overflow = overflow; };
+  }, []);
   function testLocation() {
     if (!navigator.geolocation) { setGeo('denied'); return; }
     setGeo('asking');
@@ -62,11 +78,7 @@ export default function Guide({ theme, onTheme, onClose }: { theme: string; onTh
             <span className="guide-icon"><Smartphone size={18} /></span>
             <div>
               <strong>Als App auf den Home-Bildschirm</strong>
-              {env.standalone ? <p><Check size={14} /> Läuft bereits als App.</p>
-                : env.ios ? <p>In Safari unten auf <Share size={14} className="inline-icon" /> <b>Teilen</b> tippen, dann <b>„Zum Home-Bildschirm“</b> und <b>Hinzufügen</b>.</p>
-                : env.canInstall ? <><p>Mit einem Tipp als App installieren.</p><button type="button" className="btn primary small" onClick={install}>App installieren</button></>
-                : env.android ? <p>Im Chrome-Menü <b>⋮</b> auf <b>„App installieren“</b> oder <b>„Zum Startbildschirm“</b> tippen.</p>
-                : <p>Öffne den Link am Handy: iPhone mit Safari, Android mit Chrome.</p>}
+              <InstallHint {...inst} />
             </div>
           </li>
           <li className={geo === 'ok' ? 'ok' : geo === 'denied' ? 'bad' : ''}>
