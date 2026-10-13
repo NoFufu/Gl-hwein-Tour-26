@@ -63,15 +63,21 @@ export function loadGroupCode(): string {
     history.replaceState(null, '', location.pathname + location.search);
     return normalizeCode(fromLink);
   }
-  try { return localStorage.getItem(GROUP_KEY) || ''; } catch { return ''; }
+  // Es gibt eine feste Gruppe für alle (Levis Runde). Alte Test-Gruppen auf dem Handy werden damit abgelöst.
+  saveGroupCode(HOME_GROUP);
+  return HOME_GROUP;
 }
+/** Die eine Gruppe der Tour. Levi ist dort Admin. */
+export const HOME_GROUP = 'LEVI-TOUR26';
+/** Wer sich mit dem Admin-Code anmeldet, ist auf jedem Gerät derselbe Account. */
+export const ADMIN_PROFILE: Profile = { id: 'levi-admin', name: 'Levi' };
 export const normalizeCode = (code: string) => code.trim().toUpperCase().replace(/[^A-Z0-9-]/g, '');
 export function saveGroupCode(code: string) { try { localStorage.setItem(GROUP_KEY, normalizeCode(code)); } catch {} }
 export function newGroupCode() {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return 'GLUEH-' + Array.from(crypto.getRandomValues(new Uint8Array(6)), n => alphabet[n % alphabet.length]).join('');
 }
-export const inviteLink = (code: string, look?: string) => `${location.origin}${location.pathname}#g=${encodeURIComponent(code)}${look ? `&l=${look}` : ''}`;
+export const inviteLink = (code: string) => `${location.origin}${location.pathname}#g=${encodeURIComponent(code)}`;
 
 const PROFILE_KEY = 'glueh26-profile';
 const uuid = () =>

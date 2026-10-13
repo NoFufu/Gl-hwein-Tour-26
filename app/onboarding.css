@@ -1,0 +1,20 @@
+/* Erster Start (components/Onboarding.tsx): bildschirmfüllend im gewählten App-Design. */
+.onboard { position: fixed; inset: 0; z-index: 300; overflow-y: auto; overscroll-behavior: contain; background: radial-gradient(120% 60% at 50% 0%, var(--scene-glow) 0%, var(--bg) 60%) var(--bg); color: var(--ink); padding: calc(env(safe-area-inset-top, 0px) + 20px) 20px calc(env(safe-area-inset-bottom, 0px) + 24px); }
+.onboard-inner { width: min(460px, 100%); min-height: 100%; margin: 0 auto; display: grid; grid-template-rows: auto 1fr; gap: 24px; }
+.onboard-dots { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; justify-content: center; }
+.onboard-dots li { width: 28px; height: 4px; border-radius: 4px; background: var(--line); }
+.onboard-dots li.on { background: var(--amber); }
+.onboard-step { display: grid; gap: 16px; align-content: center; }
+.onboard-logo { width: 132px; height: 132px; border-radius: 30px; box-shadow: 0 24px 50px -20px rgba(0, 0, 0, .7), 0 0 0 1px var(--line); justify-self: center; }
+.onboard h1 { font-size: 34px; line-height: 1.05; text-wrap: balance; margin: 0; }
+.onboard-lede { color: var(--muted); font-size: 16px; line-height: 1.5; margin: 0; }
+.onboard-lede svg { vertical-align: -3px; color: var(--pine); }
+.onboard-how { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.onboard-how li { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.onboard-how li span { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: var(--amber); color: var(--amber-ink); }
+.onboard-how p { margin: 0; font-size: 15px; line-height: 1.4; }
+.onboard-how b { font-weight: 600; }
+.onboard-how svg { vertical-align: -3px; }
+.onboard-input { width: 100%; min-height: 56px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 20px; }
+.onboard .btn.wide { min-height: 54px; }
+.onboard .link-btn { justify-self: center; }

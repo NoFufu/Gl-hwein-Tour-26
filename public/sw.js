@@ -1,8 +1,8 @@
 // Offline-Cache für die Glühwein-Tour. Nur gleiche Herkunft, Karten-Kacheln bleiben außen vor.
-const CACHE = 'gluehwein26-v1';
+const CACHE = 'gluehwein26-v2';
 const TILES = 'gluehwein26-tiles';
 const BASE = new URL('./', self.location).pathname; // '/' oder '/<Repo-Name>/'
-const SHELL = [BASE, BASE + 'manifest.webmanifest', BASE + 'favicon.svg', BASE + 'icon-192.png'];
+const SHELL = [BASE, BASE + 'manifest.webmanifest', BASE + 'favicon-64.png', BASE + 'icon-192.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
