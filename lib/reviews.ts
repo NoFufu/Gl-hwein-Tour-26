@@ -71,7 +71,7 @@ export function newGroupCode() {
   const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   return 'GLUEH-' + Array.from(crypto.getRandomValues(new Uint8Array(6)), n => alphabet[n % alphabet.length]).join('');
 }
-export const inviteLink = (code: string) => `${location.origin}${location.pathname}#g=${encodeURIComponent(code)}`;
+export const inviteLink = (code: string, look?: string) => `${location.origin}${location.pathname}#g=${encodeURIComponent(code)}${look ? `&l=${look}` : ''}`;
 
 const PROFILE_KEY = 'glueh26-profile';
 const uuid = () =>

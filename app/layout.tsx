@@ -8,6 +8,7 @@ import '@fontsource-variable/playfair-display';
 import '@fontsource-variable/playfair-display/wght-italic.css';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './app.css';
+import './welcome.css';
 import PwaRegister from '../components/PwaRegister';
 import { asset } from '../lib/asset';
 import { themeBootScript } from '../lib/themes';

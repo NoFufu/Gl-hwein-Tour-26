@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { ArrowUpRight, BookOpen, Camera, Crown, Download, Navigation, KeyRound, Shield, Check, ChevronRight, Copy, Images, MapPin, Map, PartyPopper, Star, Trophy, Users, Wifi, WifiOff, X } from 'lucide-react';
+import { ArrowUpRight, BookOpen, Camera, Eye, Crown, Download, Navigation, KeyRound, Shield, Check, ChevronRight, Copy, Images, MapPin, Map, PartyPopper, Star, Trophy, Users, Wifi, WifiOff, X } from 'lucide-react';
 import RatingSheet from '../components/RatingSheet';
 import StandSheet from '../components/StandSheet';
 import Guide, { ThemePicker } from '../components/Guide';
@@ -11,6 +11,8 @@ import NextPicker from '../components/NextPicker';
 import NoseBadge from '../components/ui/NoseBadge';
 import NoseSheet from '../components/NoseSheet';
 import Intro from '../components/Intro';
+import Welcome from '../components/Welcome';
+import { DEFAULT_LOOK, landingLooks, loadInviteLook, lookFromLink, saveInviteLook, type LandingLook } from '../lib/landing';
 import { exportBackup, exportCsv } from '../lib/export';
 import { applyTheme, THEME_KEY, themeById } from '../lib/themes';
 import Avatar from '../components/ui/Avatar';
@@ -80,6 +82,9 @@ export default function Home() {
   const [pickNext, setPickNext] = useState(false);
   const [noseOpen, setNoseOpen] = useState(false);
   const [intro, setIntro] = useState(false);
+  const [welcome, setWelcome] = useState<null | { look: LandingLook; preview: boolean }>(null);
+  const [invited, setInvited] = useState(false);
+  const [inviteLook, setInviteLook] = useState<LandingLook>(DEFAULT_LOOK);
   const [slogan, setSlogan] = useState(0);
   const [flashLive, setFlashLive] = useState(false);
   const wasOnline = useRef(false);
@@ -145,20 +150,24 @@ export default function Home() {
 
   useEffect(() => {
     (async () => {
+      const look = lookFromLink(); // vor loadGroupCode(), das den Link-Hash leert
+      setInviteLook(loadInviteLook());
       const p = await loadProfile();
       setProfile(p); profileRef.current = p;
-      if (!p.name.trim()) { setFirstName(true); setNameDraft(''); setAskName(() => () => {}); }
+      // Neu hier: Einladungsseite statt Start-Animation und Namensdialog.
+      const isNew = !p.name.trim();
+      if (isNew) setWelcome({ look, preview: false });
       try {
         const t = localStorage.getItem(THEME_KEY);
         if (t) { setTheme(themeById(t).id); applyTheme(themeById(t)); }
         if (p.name.trim() && !localStorage.getItem(GUIDE_KEY)) setGuide(true);
       } catch {}
       setSlogan(Math.floor(Math.random() * slogans.length));
-      try { if (!localStorage.getItem(INTRO_KEY) && !matchMedia('(prefers-reduced-motion: reduce)').matches) setIntro(true); } catch {}
+      try { if (!isNew && !localStorage.getItem(INTRO_KEY) && !matchMedia('(prefers-reduced-motion: reduce)').matches) setIntro(true); } catch {}
       const c = loadCurrent();
       if (c) { setCurrent(c); setSelected(c); }
       const code = loadGroupCode();
-      setGroup(code);
+      setGroup(code); setInvited(!!code);
       if (liveConfigured() && !code) { setGate(true); return; }
       await connect(code);
     })();
@@ -297,10 +306,21 @@ export default function Home() {
     if (firstName) { setFirstName(false); setGuide(true); }
     next?.();
   }
+  function joinFromWelcome(name: string) {
+    const preview = welcome?.preview;
+    setWelcome(null);
+    if (preview || !name) return;
+    const p = { ...profile, name };
+    setProfile(p); profileRef.current = p; saveProfile(p);
+    // Die Seite hat schon erklärt, worum es geht: Anleitung und Start-Animation nicht mehr hinterher.
+    try { localStorage.setItem(GUIDE_KEY, '1'); localStorage.setItem(INTRO_KEY, '1'); } catch {}
+    notify(`Willkommen in der Runde, ${name}!`);
+  }
+  function chooseInviteLook(look: LandingLook) { setInviteLook(look); saveInviteLook(look); }
   function changeView(v: View) { setView(v); window.scrollTo({ top: 0, behavior: 'instant' }); }
   const share = () => shareInvite(group);
   async function shareInvite(code: string) {
-    const url = code ? inviteLink(code) : location.href.split('#')[0];
+    const url = code ? inviteLink(code, inviteLook) : location.href.split('#')[0];
     try {
       if (navigator.share) await navigator.share({ title: 'Glühwein Tour 26', url });
       else { await navigator.clipboard.writeText(url); notify('Link kopiert.'); }
@@ -313,6 +333,7 @@ export default function Home() {
       <a className="skip-link" href="#inhalt">Zum Inhalt springen</a>
       <BackgroundScene palette={themeById(theme).scene} />
       {intro && <Intro slogan={slogans[slogan]} onDone={finishIntro} />}
+      {welcome && <Welcome look={welcome.look} invited={invited} preview={welcome.preview} onJoin={joinFromWelcome} onClose={() => setWelcome(null)} />}
       {(syncProblem || flashLive) && !gate && (
         <button type="button" className={`status-pill ${syncProblem ? 'warn' : 'ok'}`} onClick={() => changeView('group')} role="status">
           {syncProblem ? <WifiOff size={14} /> : <Wifi size={14} />}
@@ -473,7 +494,16 @@ export default function Home() {
             : hasAdmin === false
               ? <section className="card admin-entry"><Shield size={20} /><div><strong>Noch kein Admin</strong><p>Wer Admin ist, kann Stände ändern und Events für alle auslösen.</p></div><button type="button" className="btn ghost small" onClick={becomeAdmin}>Admin werden</button></section>
               : hasAdmin && <form className="card admin-entry" onSubmit={enterAdmin}><KeyRound size={20} /><div><strong>Admin-Code</strong><input value={adminDraft} onChange={e => setAdminDraft(e.target.value.toUpperCase())} placeholder="ADMIN-XXXXXXXX" autoComplete="off" autoCapitalize="characters" spellCheck={false} aria-label="Admin-Code" /></div><button type="submit" className="btn ghost small" disabled={adminDraft.trim().length < 8}>Freischalten</button></form>)}
-          <button type="button" className="btn primary wide" onClick={share}><Copy size={17} /> Freunde einladen</button>
+          <section className="card invite-card">
+            <div className="card-head"><h2>Einladungsseite</h2><span className="pill">sehen Neue im Link</span></div>
+            <div className="look-picker" role="group" aria-label="Look der Einladungsseite">
+              {landingLooks.map(l => <button key={l.id} type="button" aria-pressed={inviteLook === l.id} onClick={() => chooseInviteLook(l.id)}><i className={`sw-${l.id}`} aria-hidden="true" /><strong>{l.name}</strong><small>{l.hint}</small></button>)}
+            </div>
+            <div className="invite-actions">
+              <button type="button" className="btn ghost" onClick={() => setWelcome({ look: inviteLook, preview: true })}><Eye size={17} /> Vorschau</button>
+              <button type="button" className="btn primary" onClick={share}><Copy size={17} /> Freunde einladen</button>
+            </div>
+          </section>
           {live && <p className="fine">Der Einladungslink enthält euren Gruppencode. Wer ihn hat, kann mitbewerten.</p>}
           {people.length > 0 && <ul className="people">
             {people.map(p => <li key={p.id}><Avatar name={p.name} size={38} /><span className="person"><strong>{p.name}{p.id === meta.nasenmeisterId && <NoseBadge compact />}{p.id === profile.id && <span className="you">Du</span>}</strong><small>{plural(p.count, 'Stand', 'Stände')} bewertet · im Schnitt {formatScore(p.avg)}</small></span><span className="progress"><i style={{ width: `${(p.count / stands.length) * 100}%` }} /></span></li>)}
