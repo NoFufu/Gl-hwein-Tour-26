@@ -145,6 +145,12 @@ h1, h2, .stats strong, .podium-score, .score-big > strong, .review-score, .rank-
 .stand-meta .count { color: var(--muted); }
 .stack { display: flex; flex-direction: column; align-self: center; }
 .stack .avatar + .avatar { margin-top: -7px; }
+.raters { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.raters .stack { flex-direction: row; }
+.raters .stack .avatar { border-width: 1.5px; }
+.raters .stack .avatar + .avatar { margin: 0 0 0 -6px; }
+.how-link { justify-self: start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0; border: 0; background: none; color: var(--amber); font-size: 15px; font-weight: 600; }
+.now-info small u { text-decoration-thickness: 1px; text-underline-offset: 2px; }
 
 .stars { position: relative; display: inline-block; line-height: 0; }
 .stars svg path { fill: currentColor; }
