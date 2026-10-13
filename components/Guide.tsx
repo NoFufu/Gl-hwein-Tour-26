@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { Check, Hand, LocateFixed, MapPin, Palette, Share, Smartphone, X } from 'lucide-react';
-import { themes } from '../lib/themes';
+import { asset } from '../lib/asset';
+import { cups, themeById, themes, type CupChoice } from '../lib/themes';
 
 type InstallPrompt = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 let deferredInstall: InstallPrompt | null = null;
@@ -15,6 +16,26 @@ export function ThemePicker({ value, onChange }: { value: string; onChange: (id:
           <span className="swatch" style={{ background: t.vars['--bg'] }}><i style={{ background: t.vars['--amber'] }} /><i style={{ background: t.vars['--pine'] }} /><i style={{ background: t.vars['--cranberry'] }} /></span>
           <strong>{t.name}</strong><small>{t.hint}</small>
           {t.id === value && <Check size={14} className="theme-check" />}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Tasse frei wählen. „Automatisch" folgt dem Design, alles andere bleibt fest. */
+export function CupPicker({ value, theme, onChange }: { value: CupChoice; theme: string; onChange: (c: CupChoice) => void }) {
+  const auto = themeById(theme).cup;
+  const options: { id: CupChoice; name: string; img: string }[] = [
+    { id: 'auto', name: 'Automatisch', img: auto },
+    ...cups.map(c => ({ id: c.id, name: c.name, img: c.id })),
+  ];
+  return (
+    <div className="cup-picker" role="radiogroup" aria-label="Tasse">
+      {options.map(o => (
+        <button key={o.id} type="button" role="radio" aria-checked={o.id === value} className={`${o.id === value ? 'active' : ''}${o.id === 'auto' ? ' is-auto' : ''}`} onClick={() => onChange(o.id)}>
+          <img src={asset(`/tassen/${o.img}.png`)} alt="" width={64} height={64} loading="lazy" decoding="async" />
+          <small>{o.name}</small>
+          {o.id === value && <Check size={13} className="theme-check" />}
         </button>
       ))}
     </div>

@@ -816,3 +816,28 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 [data-ui] .stand-thumb > img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; -webkit-mask-image: linear-gradient(90deg, #000 35%, rgba(0, 0, 0, .45) 68%, transparent 92%); mask-image: linear-gradient(90deg, #000 35%, rgba(0, 0, 0, .45) 68%, transparent 92%); }
 [data-ui] .stand-main { position: relative; z-index: 1; margin-left: -14px; padding: 14px 16px 14px 0; align-content: center; }
 [data-ui] .stand-card .tick { left: 10px; top: 10px; right: auto; bottom: auto; }
+
+/* Karte einklappbar: Kopf ist der Schalter, die Auswahlzeile mit Route bleibt sichtbar */
+.map-toggle { width: 100%; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; align-items: center; }
+.map-toggle-hint { display: inline-flex; align-items: center; gap: 4px; flex: none; color: var(--muted); font-size: 13px; }
+.map-toggle-hint svg { transition: transform .25s ease; }
+.map-card:not(.is-closed) .map-toggle-hint svg { transform: rotate(180deg); }
+.map-body { animation: map-in .28s ease both; }
+@keyframes map-in { from { opacity: 0; transform: translateY(-6px); } }
+.map-card.is-closed .map-selected { border-top: 0; }
+@media (prefers-reduced-motion: reduce) { .map-body { animation: none; } .map-toggle-hint svg { transition: none; } }
+
+/* Tassen-Auswahl unter dem Design */
+.cup-head { display: grid; gap: 2px; padding: 4px 18px 10px; }
+.cup-head strong { font-size: 15px; }
+.cup-head small { color: var(--muted); font-size: 13px; }
+.cup-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 14px 14px; }
+.cup-picker button { position: relative; display: grid; justify-items: center; gap: 4px; padding: 10px 6px 8px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-align: center; }
+.cup-picker button.active { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber); }
+.cup-picker img { width: 64px; height: 64px; object-fit: contain; }
+.cup-picker small { font-size: 12px; line-height: 1.2; color: var(--muted); }
+.cup-picker button.active small { color: var(--ink); }
+.cup-picker .is-auto img { filter: drop-shadow(0 0 10px rgba(var(--amber-rgb, 242, 178, 74), .45)); }
+
+/* Inhalt immer über der Hintergrund-Szene: ohne Einblend-Animation (Bewegung reduziert) lag die Szene sonst über statischen Karten und schluckte Taps */
+.content { position: relative; z-index: 1; }

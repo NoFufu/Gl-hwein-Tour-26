@@ -1,10 +1,10 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { ArrowUpRight, BookOpen, Camera, Crown, Download, Navigation, KeyRound, Shield, Check, ChevronRight, Copy, Images, MapPin, Map, PartyPopper, Star, Trophy, Users, Wifi, WifiOff, X } from 'lucide-react';
+import { ArrowUpRight, BookOpen, Camera, Crown, Download, Navigation, KeyRound, Shield, Check, ChevronDown, ChevronRight, Copy, Images, MapPin, Map, PartyPopper, Star, Trophy, Users, Wifi, WifiOff, X } from 'lucide-react';
 import RatingSheet from '../components/RatingSheet';
 import StandSheet from '../components/StandSheet';
-import Guide, { ThemePicker } from '../components/Guide';
+import Guide, { CupPicker, ThemePicker } from '../components/Guide';
 import AdminView from '../components/AdminView';
 import EventBanner from '../components/EventBanner';
 import NextPicker from '../components/NextPicker';
@@ -13,7 +13,7 @@ import NoseSheet from '../components/NoseSheet';
 import Intro from '../components/Intro';
 import Onboarding from '../components/Onboarding';
 import { exportBackup, exportCsv } from '../lib/export';
-import { applyTheme, THEME_KEY, themeById } from '../lib/themes';
+import { applyTheme, CUP_KEY, isCupChoice, THEME_KEY, themeById, type CupChoice } from '../lib/themes';
 import Avatar from '../components/ui/Avatar';
 import CountUp from '../components/ui/CountUp';
 import ShinyText from '../components/ui/ShinyText';
@@ -42,6 +42,7 @@ function loadSeen(): string[] { try { return JSON.parse(localStorage.getItem(SEE
 const CURRENT_KEY = 'glueh26-current';
 const GUIDE_KEY = 'glueh26-guide-done';
 const INTRO_KEY = 'glueh26-intro-seen';
+const MAP_KEY = 'glueh26-map';
 const slogans = [
   'Ob rot, ob weiß – Hauptsache heiß!',
   'Sieben Stopps. Null Ausreden.',
@@ -72,6 +73,8 @@ export default function Home() {
   const [firstName, setFirstName] = useState(false);
   const [guide, setGuide] = useState(false);
   const [theme, setTheme] = useState('marktnacht');
+  const [cup, setCup] = useState<CupChoice>('auto');
+  const [mapOpen, setMapOpen] = useState(true);
   const [standsVersion, setStandsVersion] = useState(0);
   const [adminKey, setAdminKey] = useState('');
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null);
@@ -155,6 +158,9 @@ export default function Home() {
       try {
         const t = localStorage.getItem(THEME_KEY);
         if (t) { setTheme(themeById(t).id); applyTheme(themeById(t)); }
+        const cp = localStorage.getItem(CUP_KEY);
+        if (isCupChoice(cp)) setCup(cp);
+        if (localStorage.getItem(MAP_KEY) === 'zu') setMapOpen(false);
         if (p.name.trim() && !localStorage.getItem(GUIDE_KEY)) setGuide(true);
       } catch {}
       setSlogan(Math.floor(Math.random() * slogans.length));
@@ -231,6 +237,14 @@ export default function Home() {
     setTheme(t.id); applyTheme(t);
     try { localStorage.setItem(THEME_KEY, t.id); } catch {}
   }
+  function chooseCup(c: CupChoice) {
+    setCup(c);
+    try { localStorage.setItem(CUP_KEY, c); } catch {}
+  }
+  function toggleMap(open = !mapOpen) {
+    setMapOpen(open);
+    try { localStorage.setItem(MAP_KEY, open ? 'auf' : 'zu'); } catch {}
+  }
   function dismissEvent(id: string) {
     const next = [...seen, id].slice(-50);
     setSeen(next);
@@ -269,6 +283,7 @@ export default function Home() {
   function startRoute(id: string) {
     setOpenStand(null); setView('tour'); setSelected(id);
     setRoute({ to: id, from: now, n: Date.now() });
+    if (!mapOpen) toggleMap(true);
     setTimeout(() => document.getElementById('map-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
   }
   async function saveRating(r: Rating) {
@@ -362,7 +377,7 @@ export default function Home() {
               {isNose && <button type="button" className="nose-btn" onClick={() => setNoseOpen(true)}><span aria-hidden="true">👃</span> Nasenmeister-Ansage</button>}
             </div>
             <div className="hero-cup">
-              <WinterCup variant={themeById(theme).cup} />
+              <WinterCup variant={cup === 'auto' ? themeById(theme).cup : cup} />
             </div>
           </section>
 
@@ -376,9 +391,12 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="card map-card" id="map-card">
-            <div className="card-head"><h2>Durch die Altstadt</h2></div>
-            <TourMap key={standsVersion} selected={selected} current={now} ratedIds={[...ownRated]} route={route} onSelect={id => { setSelected(id); }} onRouteClose={() => setRoute(null)} />
+          <section className={`card map-card${mapOpen ? '' : ' is-closed'}`} id="map-card">
+            <button type="button" className="card-head map-toggle" aria-expanded={mapOpen} aria-controls="tour-map" onClick={() => toggleMap()}>
+              <h2>Durch die Altstadt</h2>
+              <span className="map-toggle-hint">{mapOpen ? 'Zuklappen' : 'Karte zeigen'}<ChevronDown size={18} aria-hidden="true" /></span>
+            </button>
+            {mapOpen && <div id="tour-map" className="map-body"><TourMap key={standsVersion} selected={selected} current={now} ratedIds={[...ownRated]} route={route} onSelect={id => { setSelected(id); }} onRouteClose={() => setRoute(null)} /></div>}
             <div className="map-selected">
               <button type="button" className="map-selected-main" onClick={() => setOpenStand(standById(selected))}>
                 <span className="num">{stopNumber(selected)}</span>
@@ -495,6 +513,8 @@ export default function Home() {
           <section className="card design-card">
             <div className="card-head"><h2>Design</h2><span className="pill">nur auf deinem Handy</span></div>
             <ThemePicker value={theme} onChange={chooseTheme} />
+            <div className="cup-head"><strong>Deine Tasse</strong><small>Wechselt mit dem Design, außer du legst eine fest.</small></div>
+            <CupPicker value={cup} theme={theme} onChange={chooseCup} />
           </section>
           <button type="button" className="btn ghost wide" onClick={() => setGuide(true)}><BookOpen size={17} /> Anleitung & Handy-Check</button>
           <section className="card export-card">

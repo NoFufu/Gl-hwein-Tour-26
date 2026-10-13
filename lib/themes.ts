@@ -59,3 +59,15 @@ export function applyTheme(theme: Theme) {
 }
 /** Läuft vor dem ersten Zeichnen (im <head>), damit kein falsches Farbschema aufblitzt. */
 export const themeBootScript = `try{var i=localStorage.getItem('${THEME_KEY}'),t=${JSON.stringify(Object.fromEntries(themes.map(t => [t.id, t.vars])))}[i];if(t){for(var k in t)document.documentElement.style.setProperty(k,t[k]);document.documentElement.dataset.theme=i}}catch(e){}`;
+
+/** Tassen zur freien Wahl. `auto` heißt: die Tasse wechselt mit dem Design. */
+export type CupChoice = CupVariant | 'auto';
+export const CUP_KEY = 'glueh26-cup';
+export const cups: { id: CupVariant; name: string }[] = [
+  { id: 'classic', name: 'Klassik' },
+  { id: 'tanne', name: 'Tanne' },
+  { id: 'eisbaer', name: 'Eisbär' },
+  { id: 'zucker', name: 'Zuckerstange' },
+  { id: 'schneemann', name: 'Schneemann' },
+];
+export const isCupChoice = (v: unknown): v is CupChoice => v === 'auto' || cups.some(c => c.id === v);
