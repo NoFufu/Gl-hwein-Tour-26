@@ -9,8 +9,8 @@ import { asset } from '../lib/asset';
  *  Glasierte Keramik (PBR mit Klarlack) in einer Studio-Lichtumgebung, weicher Schattenwurf auf einer unsichtbaren Fläche.
  *  classic: die "26 Bielefeld"-Tasse · tanne: Tannentasse mit Schneehaube · eisbaer: Eisbär mit Ohren und Gesicht
  *  zucker: Zuckerstangen-Tasse mit Streifenhenkel · schneemann: Schneemann mit Möhrennase und Schal
- *  weihnachtsmann: rote Mütze mit Fellrand, Gesicht, Rauschebart und Gürtel · pinguin: Pinguin mit Bauchfleck, Schnabel, Flügeln und Füßen */
-export type CupVariant = 'classic' | 'tanne' | 'eisbaer' | 'zucker' | 'schneemann' | 'weihnachtsmann' | 'pinguin';
+ *  weihnachtsmann: Mütze auf dem Rand, Gesicht, Rauschebart, Mantel mit Gürtel und Stiefel · pinguin: Pinguin mit Bauchfleck, Schnabel, Flügeln und Füßen */
+export type CupVariant = 'classic' | 'tanne' | 'eisbaer' | 'zucker' | 'schneemann' | 'weihnachtsmann' | 'pinguin' | 'norweger';
 
 function canvasTexture(w: number, h: number, draw: (c: CanvasRenderingContext2D) => void) {
   const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
@@ -69,7 +69,7 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
     const body: Record<CupVariant, THREE.Material> = {
       classic: new THREE.MeshPhysicalMaterial({ color: 0x86132f, roughness: .19, metalness: .05, clearcoat: 1, clearcoatRoughness: .12 }),
       tanne: toon(0x1f6a45), eisbaer: toon(0xf2f6fb, undefined, .38), zucker: toon(0xffffff, stripes('#fff6f3', '#d92c46', 5)), schneemann: toon(0xf7f9fc, undefined, .4),
-      weihnachtsmann: toon(0x8c0816, undefined, .3), pinguin: toon(0x101828, undefined, .28),
+      weihnachtsmann: toon(0xf7f4f1, undefined, .32), norweger: toon(0xb3121f, undefined, .3), pinguin: toon(0x101828, undefined, .28),
     };
     const ceramic = body[variant];
     const outer = new THREE.SplineCurve([[0, -.78], [.5, -.78], [.64, -.75], [.72, -.64], [.76, -.3], [.79, .3], [.805, .66]].map(([x, y]) => new THREE.Vector2(x, y))).getPoints(28);
@@ -79,7 +79,7 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
     mug.add(new THREE.Mesh(new THREE.LatheGeometry(profile, 128), ceramic));
     const handleCurve = new THREE.CatmullRomCurve3([new THREE.Vector3(.72, .48, 0), new THREE.Vector3(1.2, .5, 0), new THREE.Vector3(1.42, .1, 0), new THREE.Vector3(1.25, -.36, 0), new THREE.Vector3(.74, -.42, 0)]);
     const handleMat = variant === 'zucker' ? toon(0xffffff, Object.assign(stripes('#ffffff', '#e2364d', 3), { wrapS: THREE.RepeatWrapping, repeat: new THREE.Vector2(6, 1) }))
-      : variant === 'tanne' ? toon(0x8a5a3a) : ceramic;
+      : variant === 'tanne' ? toon(0x8a5a3a) : variant === 'weihnachtsmann' ? toon(0xc0182a, undefined, .3) : ceramic;
     mug.add(new THREE.Mesh(new THREE.TubeGeometry(handleCurve, 80, variant === 'zucker' ? .13 : .115, 24, false), handleMat));
     const drink = variant === 'eisbaer' ? 0x5a3020 : 0x3e0715;
     const liquid = new THREE.Mesh(new THREE.CircleGeometry(.715, 96), new THREE.MeshStandardMaterial({ color: drink, roughness: .22, metalness: 0, envMapIntensity: .25 }));
@@ -102,6 +102,22 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
       d.position.y = .04; mug.add(d); return d;
     };
     const fluff = (color = 0xfffbf7) => new THREE.MeshPhysicalMaterial({ color, roughness: .95, sheen: 1, sheenColor: new THREE.Color(0xffffff), sheenRoughness: .5 });
+    // Weihnachtsmütze schräg hinten auf dem Rand: gebogener Kegel, Fellrand, Bommel
+    const santaHat = (fur: THREE.Material) => {
+      const hat = new THREE.Group(), red = toon(0xc0182a, undefined, .35);
+      const lower = new THREE.Mesh(new THREE.CylinderGeometry(.27, .56, .5, 48), red); lower.position.y = .25; hat.add(lower);
+      // obere Hälfte kippt weich nach vorne über
+      const fold = new THREE.Group(); fold.position.y = .48; fold.rotation.z = -.95; hat.add(fold);
+      const joint = new THREE.Mesh(new THREE.SphereGeometry(.27, 32, 20), red); fold.add(joint);
+      const upper = new THREE.Mesh(new THREE.ConeGeometry(.27, .62, 40), red); upper.position.y = .3; fold.add(upper);
+      const tip = new THREE.Mesh(new THREE.SphereGeometry(.13, 20, 16), fur); tip.position.y = .62; fold.add(tip);
+      const band = new THREE.Mesh(new THREE.TorusGeometry(.56, .12, 20, 64), fur); band.rotation.x = Math.PI / 2; hat.add(band);
+      hat.position.set(-.1, .8, -.42); hat.rotation.set(-.28, .5, .18); hat.scale.setScalar(.95); mug.add(hat);
+      return tip;
+    };
+    const boots = (mat: THREE.Material) => {
+      for (const s of [-1, 1]) { const f = new THREE.Mesh(new THREE.SphereGeometry(.17, 20, 14), mat); f.position.copy(onWall(s * .3, -.8, .7)); f.scale.set(1, .42, 1.25); mug.add(f); }
+    };
     const smile = (y: number) => {
       const m = new THREE.Mesh(new THREE.TorusGeometry(.07, .016, 8, 20, Math.PI), black);
       m.position.copy(onWall(0, y, .805)); m.rotation.z = Math.PI; mug.add(m);
@@ -172,34 +188,32 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
     }
 
     if (variant === 'weihnachtsmann') {
-      // Fellrand der Mütze am Rand, Bommel am Henkel
+      // Weiß glasierte Tasse, unten der rote Mantel mit Gürtel, oben Gesicht und großer Bart, dazu die Mütze schräg auf dem Rand
       const fur = fluff();
-      const band = new THREE.Mesh(new THREE.TorusGeometry(.79, .1, 20, 120), fur); band.rotation.x = Math.PI / 2; band.position.y = .7; band.scale.z = 1.25; mug.add(band);
-      const pom = new THREE.Mesh(new THREE.SphereGeometry(.17, 24, 18), fur); pom.position.set(1.4, .2, 0); mug.add(pom);
-      charm = pom;
-      // Gesicht als Aufdruck, darauf Augen, Nase, Bart und Schnurrbart als Formen
-      decal(c => { c.fillStyle = '#f6c9a8'; c.beginPath(); c.ellipse(256, 120, 175, 112, 0, 0, Math.PI * 2); c.fill(); }, 1.6);
+      decal(c => {
+        c.fillStyle = '#c0182a'; c.fillRect(0, 330, 512, 182);
+        c.fillStyle = '#f6c9a8'; c.beginPath(); c.ellipse(256, 108, 62, 96, 0, 0, Math.PI * 2); c.fill();
+      }, Math.PI * 2 - .35);
       for (const s of [-1, 1]) {
-        const eye = new THREE.Mesh(new THREE.SphereGeometry(.06, 18, 14), black); eye.position.copy(onWall(s * .22, .42, .8)); eye.scale.z = .5; eye.lookAt(eye.position.clone().multiplyScalar(2)); mug.add(eye);
-        const shine = new THREE.Mesh(new THREE.SphereGeometry(.018, 10, 8), white); shine.position.copy(onWall(s * .22 - .025, .445, .835)); mug.add(shine);
+        const eye = new THREE.Mesh(new THREE.SphereGeometry(.06, 18, 14), black); eye.position.copy(onWall(s * .22, .44, .8)); eye.scale.z = .5; eye.lookAt(eye.position.clone().multiplyScalar(2)); mug.add(eye);
+        const shine = new THREE.Mesh(new THREE.SphereGeometry(.018, 10, 8), white); shine.position.copy(onWall(s * .22 - .025, .465, .835)); mug.add(shine);
         const cheek = new THREE.Mesh(new THREE.CircleGeometry(.075, 24), new THREE.MeshBasicMaterial({ color: 0xff7f8f, transparent: true, opacity: .6, depthWrite: false }));
-        cheek.position.copy(onWall(s * .4, .28, .806)); cheek.lookAt(cheek.position.clone().multiplyScalar(2)); mug.add(cheek);
-        const brow = new THREE.Mesh(new THREE.CapsuleGeometry(.03, .1, 4, 10), fur); brow.position.copy(onWall(s * .23, .52, .815)); brow.rotation.set(0, s * -.22, Math.PI / 2 + s * .25); mug.add(brow);
+        cheek.position.copy(onWall(s * .4, .3, .806)); cheek.lookAt(cheek.position.clone().multiplyScalar(2)); mug.add(cheek);
+        const brow = new THREE.Mesh(new THREE.CapsuleGeometry(.032, .11, 4, 10), fur); brow.position.copy(onWall(s * .23, .55, .815)); brow.rotation.set(0, s * -.22, Math.PI / 2 + s * .25); mug.add(brow);
       }
-      const nose = new THREE.Mesh(new THREE.SphereGeometry(.085, 20, 16), toon(0xf08a7a)); nose.position.copy(onWall(0, .3, .85)); nose.scale.z = .7; mug.add(nose);
-      // Bart: viele weiche Kugeln unten an der Vorderseite
-      const beard = new THREE.Group();
-      for (let i = 0; i < 18; i++) {
-        // drei Reihen dicker Locken, nach unten schmaler, außen kleiner
-        const row = i % 3, k = Math.floor(i / 3) / 5 - .5, y = .1 - row * .17, w = .62 - row * .17;
-        const r = .155 - Math.abs(k) * .06 - row * .01;
-        const b = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 14), fur); b.position.copy(onWall(k * w * 1.9, y, .8)); b.lookAt(b.position.clone().setY(y).multiplyScalar(2)); b.scale.z = .55; beard.add(b);
+      const nose = new THREE.Mesh(new THREE.SphereGeometry(.085, 20, 16), toon(0xf08a7a)); nose.position.copy(onWall(0, .32, .85)); nose.scale.z = .7; mug.add(nose);
+      // Bart: eine große weiche Form vorne, unten spitz, mit wenigen Locken am Rand
+      const beard = new THREE.Mesh(new THREE.SphereGeometry(.5, 40, 28, 0, Math.PI * 2, 0, Math.PI), fur);
+      beard.geometry.translate(0, -.12, 0); beard.position.copy(onWall(0, .02, .62)); beard.scale.set(1.12, .78, .42); mug.add(beard);
+      for (const [a, y, r] of [[-.52, .14, .12], [.52, .14, .12], [-.42, -.12, .13], [.42, -.12, .13], [-.2, -.32, .13], [.2, -.32, .13], [0, -.4, .13]]) {
+        const b = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 14), fur); b.position.copy(onWall(a, y, .82)); b.lookAt(b.position.clone().setY(y).multiplyScalar(2)); b.scale.z = .6; mug.add(b);
       }
-      mug.add(beard);
-      for (const s of [-1, 1]) { const m = new THREE.Mesh(new THREE.CapsuleGeometry(.07, .18, 6, 14), fur); m.position.copy(onWall(s * .13, .19, .87)); m.rotation.set(0, s * -.12, Math.PI / 2 + s * .35); mug.add(m); }
-      // Gürtel mit goldener Schnalle
-      const belt = new THREE.Mesh(new THREE.TorusGeometry(.765, .05, 10, 100), black); belt.rotation.x = Math.PI / 2; belt.position.y = -.56; belt.scale.z = 1.6; mug.add(belt);
-      const buckle = new THREE.Mesh(new RoundedBoxGeometry(.24, .17, .05, 2, .02), gold); buckle.position.copy(onWall(0, -.56, .8)); buckle.lookAt(buckle.position.clone().setY(-.56).multiplyScalar(2)); mug.add(buckle);
+      for (const s of [-1, 1]) { const m = new THREE.Mesh(new THREE.CapsuleGeometry(.075, .19, 6, 14), fur); m.position.copy(onWall(s * .13, .21, .9)); m.rotation.set(0, s * -.12, Math.PI / 2 + s * .35); mug.add(m); }
+      // Gürtel mit goldener Schnalle, schwarze Stiefel
+      const belt = new THREE.Mesh(new THREE.TorusGeometry(.765, .05, 10, 100), black); belt.rotation.x = Math.PI / 2; belt.position.y = -.5; belt.scale.z = 1.6; mug.add(belt);
+      const buckle = new THREE.Mesh(new RoundedBoxGeometry(.24, .17, .05, 2, .02), gold); buckle.position.copy(onWall(0, -.5, .8)); buckle.lookAt(buckle.position.clone().setY(-.5).multiplyScalar(2)); mug.add(buckle);
+      boots(black);
+      charm = santaHat(fur);
     }
     if (variant === 'pinguin') {
       // weißer Bauch- und Gesichtsfleck als Aufdruck
@@ -213,14 +227,31 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
       const beak = new THREE.Mesh(new THREE.ConeGeometry(.08, .2, 18), orange); beak.position.copy(onWall(0, .17, .86)); beak.rotation.x = Math.PI / 2; beak.scale.set(1.3, 1, .8); mug.add(beak);
       // kleine Flügel an den Seiten, Füße vorne am Boden
       for (const s of [-1, 1]) {
-        const wing = new THREE.Mesh(new THREE.SphereGeometry(.26, 22, 16), ceramic); wing.position.copy(onWall(s * 1.25, -.12, .74)); wing.scale.set(.32, 1, .62); wing.rotation.z = s * -.25; wing.lookAt(wing.position.clone().setY(-.12).multiplyScalar(2)); wing.rotateZ(s * .3); mug.add(wing);
+        const wing = new THREE.Mesh(new THREE.SphereGeometry(.26, 22, 16), ceramic); wing.position.copy(onWall(s * 1.3, -.05, .8)); wing.scale.set(.3, 1.05, .6); wing.rotation.z = s * -.25; wing.lookAt(wing.position.clone().setY(-.12).multiplyScalar(2)); wing.rotateZ(s * .3); mug.add(wing);
         const foot = new THREE.Mesh(new THREE.SphereGeometry(.16, 20, 14), orange); foot.position.copy(onWall(s * .27, -.82, .72)); foot.scale.set(1, .34, 1.2); mug.add(foot);
       }
-      // rote Bommelmütze als Rand
-      const red = toon(0xd8344a, Object.assign(stripes('#d8344a', '#b8243a', 10), { wrapS: THREE.RepeatWrapping, repeat: new THREE.Vector2(10, 1) }), .7);
-      const cap = new THREE.Mesh(new THREE.TorusGeometry(.785, .085, 18, 120), red); cap.rotation.x = Math.PI / 2; cap.position.y = .72; cap.scale.z = 1.2; mug.add(cap);
-      const pom = new THREE.Mesh(new THREE.SphereGeometry(.15, 22, 16), fluff()); pom.position.copy(onWall(-.9, .86, .74)); mug.add(pom);
-      charm = pom;
+      charm = santaHat(fluff());
+    }
+
+    if (variant === 'norweger') {
+      // Norweger-Muster: Bordüren, Zackenreihen und Schneeflocken als Glasur rundherum
+      const knit = canvasTexture(1024, 256, c => {
+        c.fillStyle = '#b3121f'; c.fillRect(0, 0, 1024, 256); c.fillStyle = '#fff6ee';
+        const px = 8;
+        for (let x = 0; x < 1024; x += px) { // Zickzack oben und unten
+          const z = Math.abs(((x / px) % 8) - 4);
+          c.fillRect(x, 26 + z * px / 2, px, px); c.fillRect(x, 214 - z * px / 2, px, px);
+        }
+        c.fillRect(0, 10, 1024, 6); c.fillRect(0, 240, 1024, 6);
+        for (let i = 0; i < 8; i++) { // Schneeflocken
+          const cx = 64 + i * 128, cy = 128;
+          for (let k = -4; k <= 4; k++) { c.fillRect(cx + k * px - px / 2, cy - px / 2, px, px); c.fillRect(cx - px / 2, cy + k * px - px / 2, px, px); if (Math.abs(k) < 4 && k) { c.fillRect(cx + k * px - px / 2, cy + k * px - px / 2, px, px); c.fillRect(cx + k * px - px / 2, cy - k * px - px / 2, px, px); } }
+        }
+        for (let i = 0; i < 8; i++) { c.fillRect(128 + i * 128 - px / 2, 124, px, px); c.fillRect(128 + i * 128 - px * 1.5, 88, px, px); c.fillRect(128 + i * 128 + px / 2, 160, px, px); }
+      });
+      const wall = new THREE.Mesh(new THREE.CylinderGeometry(.801, .75, 1.1, 96, 1, true), new THREE.MeshPhysicalMaterial({ map: knit, roughness: .3, clearcoat: .9, clearcoatRoughness: .12, polygonOffset: true, polygonOffsetFactor: -2 }));
+      wall.position.y = .04; mug.add(wall);
+      const lip = new THREE.Mesh(new THREE.TorusGeometry(.77, .03, 12, 80), toon(0xfff6ee)); lip.rotation.x = Math.PI / 2; lip.position.y = .755; mug.add(lip);
     }
 
     // Dampf und Schatten

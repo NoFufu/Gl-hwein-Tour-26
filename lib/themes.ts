@@ -71,5 +71,6 @@ export const cups: { id: CupVariant; name: string }[] = [
   { id: 'schneemann', name: 'Schneemann' },
   { id: 'weihnachtsmann', name: 'Weihnachtsmann' },
   { id: 'pinguin', name: 'Pinguin' },
+  { id: 'norweger', name: 'Norweger' },
 ];
 export const isCupChoice = (v: unknown): v is CupChoice => v === 'auto' || cups.some(c => c.id === v);
