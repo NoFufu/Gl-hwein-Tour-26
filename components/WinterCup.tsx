@@ -8,8 +8,9 @@ import { asset } from '../lib/asset';
 /** Pro Design eine eigene Tasse, komplett aus Three.js-Grundformen gebaut (keine 3D-Datei, keine Lizenzfragen).
  *  Glasierte Keramik (PBR mit Klarlack) in einer Studio-Lichtumgebung, weicher Schattenwurf auf einer unsichtbaren Fläche.
  *  classic: die "26 Bielefeld"-Tasse · tanne: Tannentasse mit Schneehaube · eisbaer: Eisbär mit Ohren und Gesicht
- *  zucker: Zuckerstangen-Tasse mit Streifenhenkel · schneemann: Schneemann mit Möhrennase und Schal */
-export type CupVariant = 'classic' | 'tanne' | 'eisbaer' | 'zucker' | 'schneemann';
+ *  zucker: Zuckerstangen-Tasse mit Streifenhenkel · schneemann: Schneemann mit Möhrennase und Schal
+ *  weihnachtsmann: rote Mütze mit Fellrand, Gesicht, Rauschebart und Gürtel · pinguin: Pinguin mit Bauchfleck, Schnabel, Flügeln und Füßen */
+export type CupVariant = 'classic' | 'tanne' | 'eisbaer' | 'zucker' | 'schneemann' | 'weihnachtsmann' | 'pinguin';
 
 function canvasTexture(w: number, h: number, draw: (c: CanvasRenderingContext2D) => void) {
   const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
@@ -68,6 +69,7 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
     const body: Record<CupVariant, THREE.Material> = {
       classic: new THREE.MeshPhysicalMaterial({ color: 0x86132f, roughness: .19, metalness: .05, clearcoat: 1, clearcoatRoughness: .12 }),
       tanne: toon(0x1f6a45), eisbaer: toon(0xf2f6fb, undefined, .38), zucker: toon(0xffffff, stripes('#fff6f3', '#d92c46', 5)), schneemann: toon(0xf7f9fc, undefined, .4),
+      weihnachtsmann: toon(0x8c0816, undefined, .3), pinguin: toon(0x101828, undefined, .28),
     };
     const ceramic = body[variant];
     const outer = new THREE.SplineCurve([[0, -.78], [.5, -.78], [.64, -.75], [.72, -.64], [.76, -.3], [.79, .3], [.805, .66]].map(([x, y]) => new THREE.Vector2(x, y))).getPoints(28);
@@ -94,6 +96,12 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
         cheek.position.copy(onWall(s * .48, y - .14, .805)); cheek.lookAt(cheek.position.clone().multiplyScalar(2)); mug.add(cheek);
       }
     };
+    // Aufdruck auf der Wand (wie das Etikett): Canvas-Motiv auf einem passenden Zylinderstück
+    const decal = (draw: (c: CanvasRenderingContext2D) => void, arc = 1.46) => {
+      const d = new THREE.Mesh(new THREE.CylinderGeometry(.801, .75, 1.1, 64, 1, true, -arc / 2, arc), new THREE.MeshPhysicalMaterial({ map: canvasTexture(512, 512, draw), transparent: true, roughness: .34, clearcoat: .8, clearcoatRoughness: .14, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+      d.position.y = .04; mug.add(d); return d;
+    };
+    const fluff = (color = 0xfffbf7) => new THREE.MeshPhysicalMaterial({ color, roughness: .95, sheen: 1, sheenColor: new THREE.Color(0xffffff), sheenRoughness: .5 });
     const smile = (y: number) => {
       const m = new THREE.Mesh(new THREE.TorusGeometry(.07, .016, 8, 20, Math.PI), black);
       m.position.copy(onWall(0, y, .805)); m.rotation.z = Math.PI; mug.add(m);
@@ -161,6 +169,58 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
       const scarf = new THREE.Mesh(new THREE.TorusGeometry(.8, .075, 12, 80), scarfMat); scarf.rotation.x = Math.PI / 2; scarf.position.y = -.42; mug.add(scarf);
       const tail = new THREE.Mesh(new THREE.BoxGeometry(.2, .45, .06), scarfMat); tail.position.copy(onWall(.5, -.6, .84)); tail.rotation.set(.1, .5, .25); mug.add(tail);
       charm = tail;
+    }
+
+    if (variant === 'weihnachtsmann') {
+      // Fellrand der Mütze am Rand, Bommel am Henkel
+      const fur = fluff();
+      const band = new THREE.Mesh(new THREE.TorusGeometry(.79, .1, 20, 120), fur); band.rotation.x = Math.PI / 2; band.position.y = .7; band.scale.z = 1.25; mug.add(band);
+      const pom = new THREE.Mesh(new THREE.SphereGeometry(.17, 24, 18), fur); pom.position.set(1.4, .2, 0); mug.add(pom);
+      charm = pom;
+      // Gesicht als Aufdruck, darauf Augen, Nase, Bart und Schnurrbart als Formen
+      decal(c => { c.fillStyle = '#f6c9a8'; c.beginPath(); c.ellipse(256, 120, 175, 112, 0, 0, Math.PI * 2); c.fill(); }, 1.6);
+      for (const s of [-1, 1]) {
+        const eye = new THREE.Mesh(new THREE.SphereGeometry(.06, 18, 14), black); eye.position.copy(onWall(s * .22, .42, .8)); eye.scale.z = .5; eye.lookAt(eye.position.clone().multiplyScalar(2)); mug.add(eye);
+        const shine = new THREE.Mesh(new THREE.SphereGeometry(.018, 10, 8), white); shine.position.copy(onWall(s * .22 - .025, .445, .835)); mug.add(shine);
+        const cheek = new THREE.Mesh(new THREE.CircleGeometry(.075, 24), new THREE.MeshBasicMaterial({ color: 0xff7f8f, transparent: true, opacity: .6, depthWrite: false }));
+        cheek.position.copy(onWall(s * .4, .28, .806)); cheek.lookAt(cheek.position.clone().multiplyScalar(2)); mug.add(cheek);
+        const brow = new THREE.Mesh(new THREE.CapsuleGeometry(.03, .1, 4, 10), fur); brow.position.copy(onWall(s * .23, .52, .815)); brow.rotation.set(0, s * -.22, Math.PI / 2 + s * .25); mug.add(brow);
+      }
+      const nose = new THREE.Mesh(new THREE.SphereGeometry(.085, 20, 16), toon(0xf08a7a)); nose.position.copy(onWall(0, .3, .85)); nose.scale.z = .7; mug.add(nose);
+      // Bart: viele weiche Kugeln unten an der Vorderseite
+      const beard = new THREE.Group();
+      for (let i = 0; i < 18; i++) {
+        // drei Reihen dicker Locken, nach unten schmaler, außen kleiner
+        const row = i % 3, k = Math.floor(i / 3) / 5 - .5, y = .1 - row * .17, w = .62 - row * .17;
+        const r = .155 - Math.abs(k) * .06 - row * .01;
+        const b = new THREE.Mesh(new THREE.SphereGeometry(r, 18, 14), fur); b.position.copy(onWall(k * w * 1.9, y, .8)); b.lookAt(b.position.clone().setY(y).multiplyScalar(2)); b.scale.z = .55; beard.add(b);
+      }
+      mug.add(beard);
+      for (const s of [-1, 1]) { const m = new THREE.Mesh(new THREE.CapsuleGeometry(.07, .18, 6, 14), fur); m.position.copy(onWall(s * .13, .19, .87)); m.rotation.set(0, s * -.12, Math.PI / 2 + s * .35); mug.add(m); }
+      // Gürtel mit goldener Schnalle
+      const belt = new THREE.Mesh(new THREE.TorusGeometry(.765, .05, 10, 100), black); belt.rotation.x = Math.PI / 2; belt.position.y = -.56; belt.scale.z = 1.6; mug.add(belt);
+      const buckle = new THREE.Mesh(new RoundedBoxGeometry(.24, .17, .05, 2, .02), gold); buckle.position.copy(onWall(0, -.56, .8)); buckle.lookAt(buckle.position.clone().setY(-.56).multiplyScalar(2)); mug.add(buckle);
+    }
+    if (variant === 'pinguin') {
+      // weißer Bauch- und Gesichtsfleck als Aufdruck
+      decal(c => {
+        c.fillStyle = '#fbfaf7';
+        c.beginPath(); c.ellipse(196, 150, 92, 84, 0, 0, Math.PI * 2); c.ellipse(316, 150, 92, 84, 0, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.ellipse(256, 330, 170, 200, 0, 0, Math.PI * 2); c.fill();
+      }, 1.75);
+      face(.3, 0xff9fb2);
+      const orange = toon(0xff7a00, undefined, .4);
+      const beak = new THREE.Mesh(new THREE.ConeGeometry(.08, .2, 18), orange); beak.position.copy(onWall(0, .17, .86)); beak.rotation.x = Math.PI / 2; beak.scale.set(1.3, 1, .8); mug.add(beak);
+      // kleine Flügel an den Seiten, Füße vorne am Boden
+      for (const s of [-1, 1]) {
+        const wing = new THREE.Mesh(new THREE.SphereGeometry(.26, 22, 16), ceramic); wing.position.copy(onWall(s * 1.25, -.12, .74)); wing.scale.set(.32, 1, .62); wing.rotation.z = s * -.25; wing.lookAt(wing.position.clone().setY(-.12).multiplyScalar(2)); wing.rotateZ(s * .3); mug.add(wing);
+        const foot = new THREE.Mesh(new THREE.SphereGeometry(.16, 20, 14), orange); foot.position.copy(onWall(s * .27, -.82, .72)); foot.scale.set(1, .34, 1.2); mug.add(foot);
+      }
+      // rote Bommelmütze als Rand
+      const red = toon(0xd8344a, Object.assign(stripes('#d8344a', '#b8243a', 10), { wrapS: THREE.RepeatWrapping, repeat: new THREE.Vector2(10, 1) }), .7);
+      const cap = new THREE.Mesh(new THREE.TorusGeometry(.785, .085, 18, 120), red); cap.rotation.x = Math.PI / 2; cap.position.y = .72; cap.scale.z = 1.2; mug.add(cap);
+      const pom = new THREE.Mesh(new THREE.SphereGeometry(.15, 22, 16), fluff()); pom.position.copy(onWall(-.9, .86, .74)); mug.add(pom);
+      charm = pom;
     }
 
     // Dampf und Schatten
