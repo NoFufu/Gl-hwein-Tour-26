@@ -590,14 +590,14 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 @media (prefers-reduced-motion: reduce) { .nose-top { animation: none; } }
 
 /* Unterer Bereich: "Jetzt hier" und Navigation als eine Einheit */
-.bottom-ui { position: fixed; z-index: 10; left: 50%; transform: translateX(-50%); bottom: max(10px, env(safe-area-inset-bottom)); width: min(420px, calc(100% - 24px)); border-radius: 24px; border: 1px solid var(--line); background: rgba(var(--panel-rgb), .9); backdrop-filter: blur(22px) saturate(1.4); -webkit-backdrop-filter: blur(22px) saturate(1.4); box-shadow: 0 16px 40px rgba(0, 0, 0, .45); overflow: hidden; }
+.bottom-ui { position: fixed; z-index: 10; left: 50%; transform: translateX(-50%); bottom: max(10px, env(safe-area-inset-bottom)); width: min(420px, calc(100% - 24px)); border-radius: 24px; border: 1px solid var(--line); background: var(--panel-solid); box-shadow: 0 16px 40px rgba(0, 0, 0, .45); overflow: hidden; }
 .bottom-ui .now-bar { position: static; transform: none; width: auto; padding: 8px 8px 8px 12px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: rgba(var(--accent-rgb), .08); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
 .bottom-ui .now-num { width: 30px; height: 30px; font-size: 12px; }
 .bottom-ui .now-info strong { font-size: 15px; }
-.bottom-ui .now-bar .btn { min-height: 38px; }
+.bottom-ui .now-bar .btn.small { min-height: 48px; padding: 0 18px; font-size: 15px; }
 .bottom-ui .dock { position: static; transform: none; width: auto; padding: 5px 6px 6px; border: 0; border-radius: 0; background: none; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
 .bottom-ui .dock button { min-height: 50px; padding: 6px 0; }
-.app { padding-bottom: calc(150px + env(safe-area-inset-bottom)); }
+.app { padding-bottom: calc(184px + env(safe-area-inset-bottom)); }
 [data-theme="schnee"] .bottom-ui { box-shadow: 0 12px 30px rgba(35, 28, 31, .14); }
 [data-theme="tannenwald"] .bottom-ui { border-radius: 14px; }
 
