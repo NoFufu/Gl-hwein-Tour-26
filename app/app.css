@@ -547,7 +547,7 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 
 /* ───────── Persönlichkeit je Design (gleicher Aufbau, eigene Formen, Schriften und Details) ───────── */
 :root[data-theme="tannenwald"] { --radius: 12px; --radius-sm: 10px; --btn-radius: 8px; }
-[data-theme="tannenwald"] .card, [data-theme="tannenwald"] .stats, [data-theme="tannenwald"] .stand-card { background: linear-gradient(180deg, rgba(var(--ink-rgb), .07), rgba(var(--ink-rgb), .03)); box-shadow: inset 0 1px 0 rgba(var(--accent-rgb), .35); }
+[data-theme="tannenwald"] .card, [data-theme="tannenwald"] .stats, [data-theme="tannenwald"] .stand-card { background: linear-gradient(180deg, rgba(var(--ink-rgb), .07), rgba(var(--ink-rgb), .03)), rgba(var(--panel-rgb), .93); box-shadow: inset 0 1px 0 rgba(var(--accent-rgb), .35); }
 [data-theme="tannenwald"] .hero h1 { font-weight: 800; letter-spacing: -.03em; }
 [data-theme="tannenwald"] .hero h1 em { font-style: normal; }
 [data-theme="tannenwald"] .stand-card.is-done { border-left: 3px solid var(--pine); }
@@ -567,7 +567,6 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 [data-theme="zuckerstange"] .hero h1 em { font-style: normal; color: #fff; text-shadow: 3px 3px 0 var(--amber); }
 [data-theme="zuckerstange"] .card, [data-theme="zuckerstange"] .stats { position: relative; overflow: hidden; }
 [data-theme="zuckerstange"] .card::before, [data-theme="zuckerstange"] .stats::before { content: ''; position: absolute; inset: 0 0 auto; height: 6px; background: repeating-linear-gradient(-45deg, var(--amber) 0 8px, #fff 8px 16px); opacity: .8; pointer-events: none; }
-[data-theme="zuckerstange"] .btn.primary { background: repeating-linear-gradient(-45deg, var(--amber) 0 14px, #ff9a9a 14px 28px); }
 [data-theme="zuckerstange"] .btn:active, [data-theme="zuckerstange"] .stand-card:active { transform: scale(.94); transition-timing-function: cubic-bezier(.3, 1.8, .5, 1); }
 [data-theme="zuckerstange"] .now-num, [data-theme="zuckerstange"] .map-selected .num { box-shadow: 0 0 0 3px #fff inset; }
 
@@ -619,7 +618,6 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 .progress-track i.now { background: rgba(var(--accent-rgb), .55); animation: here-pulse-bar 1.8s ease-in-out infinite; }
 @keyframes here-pulse-bar { 50% { background: var(--amber); } }
 [data-theme="schnee"] .progress-card { background: rgba(255, 255, 255, .78); border-color: rgba(35, 28, 31, .08); box-shadow: 0 1px 2px rgba(35, 28, 31, .06), 0 12px 30px rgba(35, 28, 31, .07); }
-[data-theme="zuckerstange"] .progress-track i.on { background: repeating-linear-gradient(-45deg, var(--amber) 0 6px, #fff 6px 12px); }
 .stand-meta .count { color: var(--muted); }
 
 /* Hinweis auf neue Version */
@@ -798,3 +796,6 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 /* Zum Inhalt springen (Tastatur, Screenreader) */
 .skip-link { position: absolute; left: 12px; top: -60px; z-index: 200; padding: 10px 14px; border-radius: 999px; background: var(--amber); color: var(--amber-ink); font-weight: 700; text-decoration: none; }
 .skip-link:focus { top: calc(10px + env(safe-area-inset-top)); }
+
+/* Zuckerstange: Fredoka braucht normale Laufweite, sonst wirken Überschriften gequetscht */
+[data-ui][data-theme="zuckerstange"] h1, [data-ui][data-theme="zuckerstange"] h2 { font-weight: 600; letter-spacing: 0; }

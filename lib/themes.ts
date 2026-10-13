@@ -25,7 +25,7 @@ export const themes: Theme[] = [
   {
     id: 'tannenwald', cup: 'tanne', name: 'Tannenwald', hint: 'Mondnacht & Schneefall',
     vars: dark({ bg: '#0b130f', bgRgb: '11, 19, 15', ink: '#eef4ec', inkRgb: '238, 246, 236', muted: '#c3cfc5', accent: '#e6c46e', accentRgb: '230, 196, 110', accentInk: '#231a05', berry: '#e0665c', berryRgb: '224, 102, 92', pine: '#8fd1a0', pineRgb: '143, 209, 160', pineDeep: '#2f6a45', panelRgb: '15, 26, 20', panelSolid: '#13201a', sceneGlow: '#173a28' }),
-    scene: { bg: 'forest', particles: 'snow', density: 1, particleAlpha: .75, additive: true, night: [.03, .055, .045], plum: [.09, .2, .15], glow: [1, .9, .62], glow2: [1, .9, .62], warm1: [1, 1, 1], warm2: [.85, .95, 1], glowStrength: 1 },
+    scene: { bg: 'forest', particles: 'snow', density: .7, particleAlpha: .5, additive: true, night: [.03, .055, .045], plum: [.09, .2, .15], glow: [1, .9, .62], glow2: [1, .9, .62], warm1: [1, 1, 1], warm2: [.85, .95, 1], glowStrength: 1 },
   },
   {
     id: 'mitternacht', cup: 'eisbaer', name: 'Polarlicht', hint: 'Nordlichter & Sterne',
