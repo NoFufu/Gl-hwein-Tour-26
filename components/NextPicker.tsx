@@ -41,7 +41,7 @@ export default function NextPicker({ stands, current, suggestion, ownRated, bySt
           {options.map(({ s, m, done }) => (
             <li key={s.id}>
               <button type="button" className={`${done ? 'done' : ''}${s.id === suggestion ? ' suggested' : ''}`} onClick={() => onPick(s.id)}>
-                <img src={s.image || fallbackImage} alt="" width={48} height={56} loading="lazy" decoding="async" />
+                <img src={s.thumb || s.image || fallbackImage} alt="" width={48} height={56} loading="lazy" decoding="async" />
                 <span className="next-main">
                   <small>{stopNumber(s.id)} · {s.place}{s.id === suggestion && <em className="here-tag">Vorschlag</em>}</small>
                   <strong>{s.name}</strong>

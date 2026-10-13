@@ -97,7 +97,7 @@ export default function AdminView({ store, stands, adminKey, adminName, currentI
         <ol className="admin-stands">
           {stands.map((s, i) => (
             <li key={s.id}>
-              <img src={s.image || fallbackImage} alt="" />
+              <img src={s.thumb || s.image || fallbackImage} alt="" />
               <span><small>{stopNumber(s.id)} · {s.place || 'ohne Ort'}</small><strong>{s.name}</strong></span>
               <span className="admin-stand-actions">
                 <button type="button" className="icon-btn" aria-label={`${s.name} nach oben`} disabled={busy || i === 0} onClick={() => move(i, -1)}><ArrowUp size={16} /></button>
@@ -156,7 +156,8 @@ function StandEditor({ stand, isNew, store, notify, onSave, onDelete, onClose }:
     if (el && !el.open) el.showModal();
     return () => { el?.close(); document.body.style.overflow = overflow; };
   }, []);
-  const set = (k: keyof Stand, v: string) => setDraft(d => ({ ...d, [k]: v }));
+  // Ein neues Bild ersetzt auch Vorschaubild und Bildnachweis des alten Fotos.
+  const set = (k: keyof Stand, v: string) => setDraft(d => k === 'image' ? { ...d, image: v, thumb: undefined, credit: undefined } : { ...d, [k]: v });
   const setCoord = (i: 0 | 1, v: string) => { const n = parseFloat(v.replace(',', '.')); if (!Number.isNaN(n)) setDraft(d => { const c = [...d.coords] as [number, number]; c[i] = n; return { ...d, coords: c }; }); };
   async function pickImage(files: FileList | null) {
     if (!files?.[0]) return;

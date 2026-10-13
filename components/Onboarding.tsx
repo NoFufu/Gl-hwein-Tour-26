@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { ArrowRight, Check, MoreVertical, PlusSquare, Share } from 'lucide-react';
 import { asset } from '../lib/asset';
+import { photoCredit } from '../lib/data';
 import { ThemePicker, useInstall } from './Guide';
 
 /** Erster Start in drei Schritten: App auf den Home-Bildschirm, Namen eintragen, Design wählen.
@@ -32,7 +33,11 @@ export default function Onboarding({ theme, onTheme, onName, onDone }: {
         <ol className="onboard-dots" aria-label={`Schritt ${step + 1} von 3`}>{[0, 1, 2].map(i => <li key={i} className={i <= step ? 'on' : ''} />)}</ol>
 
         {step === 0 && <section className="onboard-step">
-          <img className="onboard-logo" src={asset('/icon-512.png')} alt="Glühwein Tour 26" width={132} height={132} />
+          <div className="onboard-hero">
+            <img className="onboard-photo" src={asset('/fotos/start.jpg')} alt="Bielefelder Weihnachtsmarkt am Abend" width={1000} height={560} />
+            <small className="onboard-credit">{photoCredit}</small>
+            <img className="onboard-logo" src={asset('/icon-512.png')} alt="Glühwein Tour 26" width={132} height={132} />
+          </div>
           <h1 id="onboard-title">Hol dir die App auf den Home-Bildschirm</h1>
           {env.standalone
             ? <p className="onboard-lede"><Check size={16} /> Läuft schon als App. Perfekt.</p>
