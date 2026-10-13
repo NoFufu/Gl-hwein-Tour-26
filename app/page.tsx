@@ -22,7 +22,7 @@ import SpotlightCard from '../components/ui/SpotlightCard';
 import Stars from '../components/ui/Stars';
 import { formatScore, setStands, stands, stopNumber, type Rating, type Stand } from '../lib/data';
 import type { RouteRequest } from '../components/TourMap';
-import { average, createStore, explainError, loadAdminKey, newAdminKey, saveAdminKey, type GroupEvent, type GroupMeta, inviteLink, liveConfigured, loadGroupCode, loadProfile, newGroupCode, normalizeCode, reviewId, saveGroupCode, saveProfile, type Profile, type Review, type ReviewStore, type SyncStatus } from '../lib/reviews';
+import { average, createStore, explainError, loadAdminKey, saveAdminKey, ADMIN_PROFILE, type GroupEvent, type GroupMeta, inviteLink, liveConfigured, loadGroupCode, loadProfile, newGroupCode, normalizeCode, reviewId, saveGroupCode, saveProfile, type Profile, type Review, type ReviewStore, type SyncStatus } from '../lib/reviews';
 
 const TourMap = dynamic(() => import('../components/TourMap'), { ssr: false, loading: () => <div className="map-skeleton">Karte wird geladen …</div> });
 const WinterCup = dynamic(() => import('../components/WinterCup'), { ssr: false });
@@ -83,7 +83,6 @@ export default function Home() {
   const [noseOpen, setNoseOpen] = useState(false);
   const [intro, setIntro] = useState(false);
   const [welcome, setWelcome] = useState<null | { look: LandingLook; preview: boolean }>(null);
-  const [invited, setInvited] = useState(false);
   const [inviteLook, setInviteLook] = useState<LandingLook>(DEFAULT_LOOK);
   const [slogan, setSlogan] = useState(0);
   const [flashLive, setFlashLive] = useState(false);
@@ -167,7 +166,7 @@ export default function Home() {
       const c = loadCurrent();
       if (c) { setCurrent(c); setSelected(c); }
       const code = loadGroupCode();
-      setGroup(code); setInvited(!!code);
+      setGroup(code);
       if (liveConfigured() && !code) { setGate(true); return; }
       await connect(code);
     })();
@@ -241,26 +240,27 @@ export default function Home() {
     setSeen(next);
     try { localStorage.setItem(SEEN_KEY, JSON.stringify(next)); } catch {}
   }
-  async function becomeAdmin() {
-    if (!store) return;
-    const key = newAdminKey();
-    try {
-      await store.claimAdmin(key);
-      saveAdminKey(group, key);
-      await connect(group);
-      setView('admin');
-      notify('Du bist jetzt Admin dieser Gruppe.');
-    } catch (e) { notify(e instanceof Error ? e.message : 'Hat nicht geklappt.'); setHasAdmin(true); }
+  /** Admin-Code prüfen und als Levi anmelden. Hat die Gruppe noch keinen Admin, richtet der erste Code sie ein. */
+  async function loginAdmin(raw: string): Promise<string | void> {
+    if (!store || store.mode !== 'live') return 'Noch nicht mit der Gruppe verbunden. Versuch es gleich nochmal.';
+    const key = raw.trim().toUpperCase();
+    let ok = await store.checkAdmin(key).catch(() => false);
+    if (!ok && !(await store.hasAdmin().catch(() => true))) {
+      try { await store.claimAdmin(key); ok = true; } catch (e) { return e instanceof Error ? e.message : 'Hat nicht geklappt.'; }
+    }
+    if (!ok) return 'Dieser Admin-Code passt nicht.';
+    const p = ADMIN_PROFILE;
+    setProfile(p); profileRef.current = p; saveProfile(p);
+    saveAdminKey(group, key); setAdminDraft('');
+    try { localStorage.setItem(GUIDE_KEY, '1'); localStorage.setItem(INTRO_KEY, '1'); } catch {}
+    await connect(group);
+    setView('admin');
+    notify(`Hallo ${p.name}, du bist als Admin angemeldet.`);
   }
   async function enterAdmin(e: React.FormEvent) {
     e.preventDefault();
-    if (!store) return;
-    const key = adminDraft.trim().toUpperCase();
-    if (!(await store.checkAdmin(key).catch(() => false))) { notify('Dieser Admin-Code passt nicht zur Gruppe.'); return; }
-    saveAdminKey(group, key); setAdminDraft('');
-    await connect(group);
-    setView('admin');
-    notify('Admin-Bereich freigeschaltet.');
+    const problem = await loginAdmin(adminDraft);
+    if (problem) notify(problem);
   }
   function leaveAdmin() { saveAdminKey(group, ''); setAdminKey(''); setView('group'); connect(group); }
   function finishIntro() { setIntro(false); try { localStorage.setItem(INTRO_KEY, '1'); } catch {} }
@@ -306,10 +306,12 @@ export default function Home() {
     if (firstName) { setFirstName(false); setGuide(true); }
     next?.();
   }
-  function joinFromWelcome(name: string) {
+  async function joinFromWelcome(name: string): Promise<string | void> {
     const preview = welcome?.preview;
+    if (preview || !name) { setWelcome(null); return; }
+    // Eine Zahl statt Name ist der Admin-Code.
+    if (/^\d{4,}$/.test(name)) { const problem = await loginAdmin(name); if (!problem) setWelcome(null); return problem; }
     setWelcome(null);
-    if (preview || !name) return;
     const p = { ...profile, name };
     setProfile(p); profileRef.current = p; saveProfile(p);
     // Die Seite hat schon erklärt, worum es geht: Anleitung und Start-Animation nicht mehr hinterher.
@@ -333,7 +335,7 @@ export default function Home() {
       <a className="skip-link" href="#inhalt">Zum Inhalt springen</a>
       <BackgroundScene palette={themeById(theme).scene} />
       {intro && <Intro slogan={slogans[slogan]} onDone={finishIntro} />}
-      {welcome && <Welcome look={welcome.look} invited={invited} preview={welcome.preview} onJoin={joinFromWelcome} onClose={() => setWelcome(null)} />}
+      {welcome && <Welcome look={welcome.look} preview={welcome.preview} onJoin={joinFromWelcome} onClose={() => setWelcome(null)} />}
       {(syncProblem || flashLive) && !gate && (
         <button type="button" className={`status-pill ${syncProblem ? 'warn' : 'ok'}`} onClick={() => changeView('group')} role="status">
           {syncProblem ? <WifiOff size={14} /> : <Wifi size={14} />}
@@ -487,13 +489,10 @@ export default function Home() {
           </section>
           {live && group && <section className="card code-card">
             <div><small>Gruppencode</small><strong className="tabular">{group}</strong></div>
-            <button type="button" className="btn ghost small" onClick={() => { setCodeDraft(''); setGate(true); }}>Wechseln</button>
           </section>}
           {live && group && (isAdmin
             ? <section className="card admin-entry"><Shield size={20} /><div><strong>Du bist Admin</strong><p>Stände bearbeiten und Events an alle schicken.</p></div><button type="button" className="btn primary small" onClick={() => changeView('admin')}>Öffnen</button></section>
-            : hasAdmin === false
-              ? <section className="card admin-entry"><Shield size={20} /><div><strong>Noch kein Admin</strong><p>Wer Admin ist, kann Stände ändern und Events für alle auslösen.</p></div><button type="button" className="btn ghost small" onClick={becomeAdmin}>Admin werden</button></section>
-              : hasAdmin && <form className="card admin-entry" onSubmit={enterAdmin}><KeyRound size={20} /><div><strong>Admin-Code</strong><input value={adminDraft} onChange={e => setAdminDraft(e.target.value.toUpperCase())} placeholder="ADMIN-XXXXXXXX" autoComplete="off" autoCapitalize="characters" spellCheck={false} aria-label="Admin-Code" /></div><button type="submit" className="btn ghost small" disabled={adminDraft.trim().length < 8}>Freischalten</button></form>)}
+            : <form className="card admin-entry" onSubmit={enterAdmin}><KeyRound size={20} /><div><strong>Admin-Code</strong><input value={adminDraft} onChange={e => setAdminDraft(e.target.value.toUpperCase())} placeholder={hasAdmin === false ? 'Code festlegen' : 'Code'} inputMode="numeric" autoComplete="off" autoCapitalize="characters" spellCheck={false} aria-label="Admin-Code" /></div><button type="submit" className="btn ghost small" disabled={adminDraft.trim().length < 4}>Freischalten</button></form>)}
           <section className="card invite-card">
             <div className="card-head"><h2>Einladungsseite</h2><span className="pill">sehen Neue im Link</span></div>
             <div className="look-picker" role="group" aria-label="Look der Einladungsseite">

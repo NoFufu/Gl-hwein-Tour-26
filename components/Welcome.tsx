@@ -1,73 +1,52 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, X } from 'lucide-react';
-import { criteria, stands, stopNumber } from '../lib/data';
+import { criteria, stands } from '../lib/data';
 import type { LandingLook } from '../lib/landing';
 
-const CRITERIA_HINTS = ['Würzig, rund, nicht zu süß.', 'Heiß genug für kalte Finger.', 'Lichter, Musik, Gedränge am Stand.', 'Was der Becher wert ist.', 'Wie sehr er nach dem zweiten Becher ruft.'];
-
-/** Einladungsseite für neue Leute: kurz erklären, worum es geht, Namen eintippen, fertig.
- *  `preview` zeigt sie der einladenden Person, ohne etwas zu speichern. */
-export default function Welcome({ look, invited, preview, onJoin, onClose }: {
-  look: LandingLook; invited: boolean; preview?: boolean;
-  onJoin: (name: string) => void; onClose?: () => void;
+/** Einladung als Overlay über der App: Name eintippen, fertig, man ist in Levis Gruppe.
+ *  Eine Zahl statt Name gilt als Admin-Code. `preview` zeigt das Overlay der einladenden Person, ohne etwas zu speichern. */
+export default function Welcome({ look, preview, onJoin, onClose }: {
+  look: LandingLook; preview?: boolean;
+  onJoin: (name: string) => Promise<string | void>; onClose?: () => void;
 }) {
   const [name, setName] = useState('');
-  const root = useRef<HTMLDivElement>(null);
-  useEffect(() => { root.current?.scrollTo({ top: 0 }); }, [look]);
-  const submit = (e: React.FormEvent) => { e.preventDefault(); const n = name.trim(); if (n || preview) onJoin(n); };
-  const next = invited ? 'Danach bist du direkt in der Gruppe.' : 'Danach trittst du mit dem Gruppencode bei oder gründest eine Gruppe.';
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const n = name.trim();
+    if (!n && !preview) return;
+    setBusy(true); setError('');
+    const problem = await onJoin(n);
+    setBusy(false);
+    if (problem) setError(problem);
+  };
 
   return (
-    <div ref={root} className={`wl wl-${look}`} role="dialog" aria-modal="true" aria-labelledby="wl-title">
-      {look === 'lichterkette' && <Garland />}
+    <div className={`wl wl-${look}`} role="dialog" aria-modal="true" aria-labelledby="wl-title">
       {look === 'frostklar' && <Snow />}
-      {preview && <button type="button" className="wl-close" onClick={onClose} aria-label="Vorschau schließen"><X size={20} /></button>}
-      <div className="wl-wrap">
-        <header className="wl-hero">
-          <div className="wl-copy">
-            {look === 'lichterkette' && <span className="wl-eyebrow">Bielefelder Weihnachtsmarkt · 19.11.–30.12.</span>}
-            {look === 'frostklar' && <span className="wl-mark">Glühwein Tour <b>26</b></span>}
-            {look === 'stadtplan' && <span className="wl-coord">52,0206° N · 8,5323° O · Alter Markt</span>}
-            <h1 id="wl-title">
-              {look === 'lichterkette' && <>Sieben Buden, ein <em>bester</em> Glühwein.</>}
-              {look === 'frostklar' && <>Glüh&shy;wein<br />Tour <b>26</b></>}
-              {look === 'stadtplan' && <>Eine Route.<br /><b>Sieben</b> Becher.</>}
-            </h1>
-            <p className="wl-lede">{invited ? 'Du bist eingeladen. ' : ''}Die Gruppe zieht einmal durch die Bielefelder Altstadt. An jedem Stand bewertet ihr euren Becher, am Ende steht fest, wo es dieses Jahr am besten schmeckt.</p>
-          </div>
+      <div className="wl-card">
+        {look === 'lichterkette' && <Garland />}
+        {look === 'stadtplan' && <RouteMap />}
+        {preview && <button type="button" className="wl-close" onClick={onClose} aria-label="Vorschau schließen"><X size={20} /></button>}
+        <div className="wl-body">
+          {look === 'lichterkette' && <span className="wl-eyebrow">Bielefeld · 19.11.–30.12.</span>}
+          {look === 'frostklar' && <span className="wl-k">Gruppenticket · {stands.length} Stopps · {criteria.length} Kriterien</span>}
+          {look === 'stadtplan' && <span className="wl-coord">{stands.length} Stopps · Alter Markt bis Bahnhofstraße</span>}
+          <h1 id="wl-title">
+            {look === 'lichterkette' && <>Glühwein Tour <em>26</em></>}
+            {look === 'frostklar' && <>Glühwein Tour <b>26</b></>}
+            {look === 'stadtplan' && <>Eine Route. <b>Sieben</b> Becher.</>}
+          </h1>
+          <p className="wl-lede">Du bist eingeladen. An jedem Stand bewertet ihr euren Becher, am Ende steht fest, wo es am besten schmeckt.</p>
           <form className="wl-join" onSubmit={submit}>
-            {look === 'frostklar' && <>
-              <span className="wl-k">Gruppenticket · Saison 19.11.–30.12.</span>
-              <dl><div><dt>Stopps</dt><dd>{stands.length}</dd></div><div><dt>Kriterien</dt><dd>{criteria.length}</dd></div><div><dt>Sieger</dt><dd>1</dd></div></dl>
-            </>}
             <label htmlFor="wl-name">Wie heißt du?</label>
-            <input id="wl-name" value={name} onChange={e => setName(e.target.value)} maxLength={30} required={!preview} autoComplete="given-name" placeholder="Dein Vorname" enterKeyHint="go" />
-            <button type="submit" className="wl-btn">{preview ? 'Vorschau schließen' : 'Dabei sein'} <ArrowRight size={18} /></button>
-            <p className="wl-hint">So sieht die Gruppe, wer bewertet hat. {next}</p>
+            <input id="wl-name" value={name} onChange={e => setName(e.target.value)} maxLength={30} required={!preview} autoComplete="given-name" placeholder="Dein Vorname" enterKeyHint="go" autoFocus={!preview} />
+            <button type="submit" className="wl-btn" disabled={busy}>{preview ? 'Vorschau schließen' : busy ? 'Einen Moment …' : 'Dabei sein'} {!busy && <ArrowRight size={18} />}</button>
+            {error ? <p className="wl-error" role="alert">{error}</p> : <p className="wl-hint">So sieht die Gruppe, wer bewertet hat.</p>}
           </form>
-          {look === 'stadtplan' && <RouteMap />}
-        </header>
-
-        <section className="wl-sec">
-          <h2>{look === 'frostklar' ? `${stands.length} Stopps` : look === 'stadtplan' ? 'Die Stopps' : 'Die Route'}</h2>
-          <ol className="wl-route">
-            {stands.map(s => <li key={s.id}><span className="wl-n">{stopNumber(s.id)}</span><strong>{s.name}</strong><small>{s.place} · {s.wine}</small></li>)}
-          </ol>
-        </section>
-
-        <section className="wl-sec">
-          <h2>So wird bewertet</h2>
-          <p className="wl-sub">Jede Person vergibt pro Stand 1 bis 5 Punkte in fünf Kategorien. Der Durchschnitt der Gruppe entscheidet.</p>
-          <ul className="wl-crit">
-            {criteria.map((c, i) => <li key={c} className={i === criteria.length - 1 ? 'hl' : ''}><strong>{c}</strong><small>{CRITERIA_HINTS[i] || ''}</small></li>)}
-          </ul>
-        </section>
-
-        <footer className="wl-foot">
-          <p>Ob rot, ob weiß, Hauptsache heiß.</p>
-          <button type="button" className="wl-btn" onClick={() => { root.current?.scrollTo({ top: 0, behavior: 'smooth' }); setTimeout(() => document.getElementById('wl-name')?.focus(), 350); }}>Namen eintragen</button>
-        </footer>
+        </div>
       </div>
     </div>
   );
