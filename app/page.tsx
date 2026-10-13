@@ -415,15 +415,16 @@ export default function Home() {
                 </li>
               ))}
             </ol>
-            <ol className="rank-bars" aria-label="Alle Stände im Vergleich">
-              {ranked.map((s, i) => (
+            {ranked.slice(0, 3).some(s => byStand[s.id].length < 3) && <p className="fine rank-hint">Noch wenige Stimmen, das Ranking kann sich noch drehen.</p>}
+            {ranked.length > 3 && <ol className="rank-bars" aria-label="Weitere Plätze">
+              {ranked.slice(3).map((s, i) => (
                 <li key={s.id}><button type="button" onClick={() => setOpenStand(s)}>
-                  <span className="rank">{i + 1}</span>
+                  <span className="rank">{i + 4}</span>
                   <span className="rank-bar-main"><strong>{s.name}</strong><i><b style={{ width: `${(standAvg(s.id) / 5) * 100}%` }} /></i></span>
                   <b>{formatScore(standAvg(s.id))}</b>
                 </button></li>
               ))}
-            </ol>
+            </ol>}
             <ol className="rank-list" start={4}>
               {ranked.slice(3).map((s, i) => (
                 <li key={s.id}><button type="button" onClick={() => setOpenStand(s)}><span className="rank">{i + 4}</span><span><strong>{s.name}</strong><small>{plural(byStand[s.id].length, 'Bewertung', 'Bewertungen')}</small></span><b>{formatScore(standAvg(s.id))}</b></button></li>

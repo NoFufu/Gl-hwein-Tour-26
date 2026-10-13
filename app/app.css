@@ -755,15 +755,15 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 @keyframes crown-bob { 50% { transform: translateX(-50%) translateY(-4px) rotate(6deg); } }
 [data-ui] .podium-score { font-size: 26px; }
 [data-ui] .podium .place-1 .podium-score { font-size: 34px; }
-[data-ui] .pedestal { display: grid; place-items: center; border-radius: 14px 14px 4px 4px; background: linear-gradient(rgba(var(--ink-rgb), .14), rgba(var(--ink-rgb), .04)); border: 1px solid var(--line); border-bottom: 0; font: 600 30px var(--display); color: rgba(var(--ink-rgb), .55); }
-[data-ui] .place-1 .pedestal { height: 96px; background: linear-gradient(rgba(var(--accent-rgb), .45), rgba(var(--accent-rgb), .1)); color: var(--amber-ink); border-color: rgba(var(--accent-rgb), .5); }
+[data-ui] .pedestal { display: grid; place-items: center; border-radius: 14px 14px 4px 4px; background: linear-gradient(rgba(var(--ink-rgb), .14), rgba(var(--ink-rgb), .04)); border: 1px solid var(--line); border-bottom: 0; font: 600 30px var(--display); color: var(--muted); }
+[data-ui] .place-1 .pedestal { height: 96px; background: linear-gradient(rgba(var(--accent-rgb), .45), rgba(var(--accent-rgb), .1)); color: var(--ink); border-color: rgba(var(--accent-rgb), .5); }
 [data-ui] .place-2 .pedestal { height: 66px; }
 [data-ui] .place-3 .pedestal { height: 44px; font-size: 24px; }
 [data-ui] .rank-list { display: none; }
 [data-ui] .rank-bars { display: grid; gap: 8px; list-style: none; margin: 8px 0 0; padding: 0; }
 [data-ui] .rank-bars button { width: 100%; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line); background: rgba(var(--panel-rgb), .74); color: var(--ink); text-align: left; }
-[data-ui] .rank-bars li:first-child button { border-color: rgba(var(--accent-rgb), .5); }
 [data-ui] .rank-bars .rank { width: 26px; flex: none; font: 600 18px var(--display); color: var(--muted); text-align: center; }
+[data-ui] .rank-hint { margin: 4px 0 0; text-align: center; }
 [data-ui] .rank-bar-main { flex: 1; min-width: 0; display: grid; gap: 6px; }
 [data-ui] .rank-bar-main strong { font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 [data-ui] .rank-bar-main i { height: 8px; border-radius: 99px; background: rgba(var(--ink-rgb), .1); overflow: hidden; }
