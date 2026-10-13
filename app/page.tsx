@@ -396,7 +396,7 @@ export default function Home() {
                 const everyone = groupSize > 1 && rs.length >= groupSize;
                 return (
                   <SpotlightCard key={s.id} className={`stand-card${done ? ' is-done' : ''}${s.id === now ? ' is-now' : ''}`} onClick={() => setOpenStand(s)} label={`${s.name}, ${plural(rs.length, 'Bewertung', 'Bewertungen')}`}>
-                    <span className="stand-thumb"><img src={s.image} alt="" width={64} height={76} loading="lazy" decoding="async" />{done && <span className="tick" aria-hidden="true"><Check size={22} strokeWidth={3} /></span>}</span>
+                    <span className="stand-thumb"><img src={s.thumb || s.image} alt="" width={64} height={76} loading="lazy" decoding="async" />{done && <span className="tick" aria-hidden="true"><Check size={22} strokeWidth={3} /></span>}</span>
                     <span className="stand-main">
                       <span className="stand-num">{stopNumber(s.id)}{s.id === now && <span className="here-tag">Jetzt hier</span>}{done && <span className="done"><Check size={11} /> abgehakt</span>}{everyone && <span className="done all">alle durch</span>}</span>
                       <strong>{s.name}</strong>
@@ -421,7 +421,7 @@ export default function Home() {
               {ranked.slice(0, 3).map((s, i) => (
                 <li key={s.id} className={`place-${i + 1}`}>
                   <button type="button" onClick={() => setOpenStand(s)}>
-                    <img src={s.image} alt="" width={96} height={96} />
+                    <img src={s.thumb || s.image} alt="" width={96} height={96} />
                     {i === 0 && <span className="crown" aria-hidden="true"><Crown size={22} /></span>}
                     <span className="medal">{i + 1}</span>
                     <strong>{s.name}</strong>

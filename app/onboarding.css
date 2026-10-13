@@ -18,3 +18,7 @@
 .onboard-input { width: 100%; min-height: 56px; padding: 0 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 20px; }
 .onboard .btn.wide { min-height: 54px; }
 .onboard .link-btn { justify-self: center; }
+.onboard-hero { position: relative; display: grid; justify-items: center; }
+.onboard-photo { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 22px; box-shadow: 0 0 0 1px var(--line); }
+.onboard-hero .onboard-logo { position: relative; margin-top: -70px; }
+.onboard-credit { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 999px; background: rgba(10, 6, 10, .55); color: rgba(255, 255, 255, .85); font-size: 10.5px; backdrop-filter: blur(6px); }
