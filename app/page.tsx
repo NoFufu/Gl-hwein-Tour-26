@@ -341,6 +341,7 @@ export default function Home() {
               <ShinyText>Bielefeld · 19.11.–30.12.</ShinyText>
               <h1>Glühwein<br />Tour <em>26.</em></h1>
               <button type="button" className="slogan" onClick={() => setSlogan(i => (i + 1) % slogans.length)} aria-label="Nächster Spruch">{slogans[slogan]}</button>
+              <button type="button" className="how-link" onClick={() => setGuide(true)}><BookOpen size={15} /> So funktioniert's</button>
               {isNose && <button type="button" className="nose-btn" onClick={() => setNoseOpen(true)}><span aria-hidden="true">👃</span> Nasenmeister-Ansage</button>}
             </div>
             <div className="hero-cup">
@@ -384,10 +385,9 @@ export default function Home() {
                       <strong>{s.name}</strong>
                       <small>{s.place} · {s.wine}</small>
                       <span className="stand-meta">
-                        {rs.length ? <><Stars value={avg} size={13} /><b>{formatScore(avg)}</b><span className="count">· {plural(rs.length, 'Bewertung', 'Bewertungen')}</span></> : <span className="count">Noch keine Bewertung</span>}
+                        {rs.length ? <><Stars value={avg} size={13} /><b>{formatScore(avg)}</b><span className="raters"><span className="stack">{rs.slice(0, 3).map(r => <Avatar key={r.id} name={r.author} size={18} />)}</span><span className="count">von {rs[0].author}{rs.length > 1 && ` + ${rs.length - 1}`}</span></span></> : <span className="count">Noch keine Bewertung</span>}
                       </span>
                     </span>
-                    {rs.length > 0 && <span className="stack">{rs.slice(0, 3).map(r => <Avatar key={r.id} name={r.author} size={22} />)}</span>}
                   </SpotlightCard>
                 );
               })}
@@ -415,15 +415,16 @@ export default function Home() {
                 </li>
               ))}
             </ol>
-            <ol className="rank-bars" aria-label="Alle Stände im Vergleich">
-              {ranked.map((s, i) => (
+            {ranked.slice(0, 3).some(s => byStand[s.id].length < 3) && <p className="fine rank-hint">Noch wenige Stimmen, das Ranking kann sich noch drehen.</p>}
+            {ranked.length > 3 && <ol className="rank-bars" aria-label="Weitere Plätze">
+              {ranked.slice(3).map((s, i) => (
                 <li key={s.id}><button type="button" onClick={() => setOpenStand(s)}>
-                  <span className="rank">{i + 1}</span>
+                  <span className="rank">{i + 4}</span>
                   <span className="rank-bar-main"><strong>{s.name}</strong><i><b style={{ width: `${(standAvg(s.id) / 5) * 100}%` }} /></i></span>
                   <b>{formatScore(standAvg(s.id))}</b>
                 </button></li>
               ))}
-            </ol>
+            </ol>}
             <ol className="rank-list" start={4}>
               {ranked.slice(3).map((s, i) => (
                 <li key={s.id}><button type="button" onClick={() => setOpenStand(s)}><span className="rank">{i + 4}</span><span><strong>{s.name}</strong><small>{plural(byStand[s.id].length, 'Bewertung', 'Bewertungen')}</small></span><b>{formatScore(standAvg(s.id))}</b></button></li>
@@ -509,9 +510,9 @@ export default function Home() {
 
       {!gate && <div className="bottom-ui">
       <div className="now-bar" aria-label="Aktueller Stand">
-        <button type="button" className="now-info" onClick={() => setOpenStand(nowStand)}>
+        <button type="button" className="now-info" onClick={() => setPickNext(true)} aria-label={`Jetzt hier: ${nowStand.name}. Stand wechseln`}>
           <span className="now-num">{stopNumber(now)}</span>
-          <span><small><MapPin size={11} /> Jetzt hier</small><strong>{nowStand.name}</strong></span>
+          <span><small><MapPin size={11} /> Jetzt hier · <u>wechseln</u></small><strong>{nowStand.name}</strong></span>
         </button>
         {!ownRated.has(now)
           ? <button type="button" className="btn primary small" onClick={() => startRating(nowStand)}><Star size={15} /> Bewerten</button>
