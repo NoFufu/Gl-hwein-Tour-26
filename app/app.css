@@ -800,3 +800,19 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 
 /* Zuckerstange: Fredoka braucht normale Laufweite, sonst wirken Überschriften gequetscht */
 [data-ui][data-theme="zuckerstange"] h1, [data-ui][data-theme="zuckerstange"] h2 { font-weight: 600; letter-spacing: 0; }
+
+/* Kopfzeile: Titel passt sich der Spaltenbreite an, statt am iPhone getrennt zu werden („Glüh-/wein“).
+   --hero-fit = Breite von „Glühwein“ in em der jeweiligen Schrift, plus 5 % Reserve für Safari-Metriken. */
+[data-ui] .hero { grid-template-columns: minmax(0, 1fr) 38%; }
+[data-ui] .hero-copy { container-type: inline-size; min-width: 0; }
+[data-ui] .hero h1 { --hero-fit: 4.62; font-size: clamp(34px, calc(100cqi / var(--hero-fit)), 64px); hyphens: manual; -webkit-hyphens: manual; overflow-wrap: normal; white-space: nowrap; }
+:root[data-ui][data-theme="mitternacht"] .hero h1 { --hero-fit: 4.33; }
+:root[data-ui][data-theme="zuckerstange"] .hero h1 { --hero-fit: 4.37; }
+:root[data-ui][data-theme="schnee"] .hero h1 { --hero-fit: 4.43; }
+
+/* Stand-Karten: Foto als Streifen über die volle Kartenhöhe links, weicher Übergang in den Text */
+[data-ui] .stand-card { position: relative; align-items: stretch; gap: 0; padding: 0; min-height: 112px; overflow: hidden; isolation: isolate; }
+[data-ui] .stand-thumb { width: 38%; max-width: 150px; align-self: stretch; }
+[data-ui] .stand-thumb > img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; -webkit-mask-image: linear-gradient(90deg, #000 35%, rgba(0, 0, 0, .45) 68%, transparent 92%); mask-image: linear-gradient(90deg, #000 35%, rgba(0, 0, 0, .45) 68%, transparent 92%); }
+[data-ui] .stand-main { position: relative; z-index: 1; margin-left: -14px; padding: 14px 16px 14px 0; align-content: center; }
+[data-ui] .stand-card .tick { left: 10px; top: 10px; right: auto; bottom: auto; }
