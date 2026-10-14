@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { ArrowRight, Check, MoreVertical, PlusSquare, Share } from 'lucide-react';
 import { asset } from '../lib/asset';
 import { photoCredit } from '../lib/data';
-import { ThemePicker, useInstall } from './Guide';
+import type { CupChoice } from '../lib/themes';
+import { CupPicker, ThemePicker, useInstall } from './Guide';
 
-/** Erster Start in drei Schritten: App auf den Home-Bildschirm, Namen eintragen, Design wählen.
+/** Erster Start in drei Schritten: App auf den Home-Bildschirm, Namen eintragen, Design und Tasse wählen.
  *  Eine Zahl statt Name gilt als Admin-Code (dann gibt `onName` ggf. einen Fehlertext zurück). */
-export default function Onboarding({ theme, onTheme, onName, onDone }: {
-  theme: string; onTheme: (id: string) => void;
+export default function Onboarding({ theme, onTheme, cup, onCup, onName, onDone }: {
+  theme: string; onTheme: (id: string) => void; cup: CupChoice; onCup: (c: CupChoice) => void;
   onName: (name: string) => Promise<string | void>; onDone: () => void;
 }) {
   const [step, setStep] = useState(0);
@@ -68,9 +69,11 @@ export default function Onboarding({ theme, onTheme, onName, onDone }: {
         </form>}
 
         {step === 2 && <section className="onboard-step">
-          <h1 id="onboard-title">Such dir ein Design aus</h1>
-          <p className="onboard-lede">Gilt nur auf deinem Handy. Du kannst es später unter „Gruppe“ ändern.</p>
+          <h1 id="onboard-title">Design und Tasse</h1>
+          <p className="onboard-lede">Gilt nur auf deinem Handy. Später änderst du beides auf der Startseite unter „Design & Tasse“.</p>
           <ThemePicker value={theme} onChange={onTheme} />
+          <h2 className="onboard-sub">Deine Tasse</h2>
+          <CupPicker value={cup} theme={theme} onChange={onCup} />
           <button type="button" className="btn primary wide" onClick={onDone}><Check size={18} /> Los geht’s</button>
         </section>}
       </div>

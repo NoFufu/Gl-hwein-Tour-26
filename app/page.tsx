@@ -1,19 +1,20 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { ArrowUpRight, BookOpen, Camera, Crown, Download, Navigation, KeyRound, Shield, Check, ChevronDown, ChevronRight, Copy, Images, MapPin, Map, PartyPopper, Star, Trophy, Users, Wifi, WifiOff, X } from 'lucide-react';
+import { ArrowUpRight, BookOpen, Camera, Crown, Download, Navigation, KeyRound, Shield, Check, ChevronDown, ChevronRight, Copy, Palette, Images, MapPin, Map, PartyPopper, Star, Trophy, Users, Wifi, WifiOff, X } from 'lucide-react';
 import RatingSheet from '../components/RatingSheet';
 import StandSheet from '../components/StandSheet';
-import Guide, { CupPicker, ThemePicker } from '../components/Guide';
+import Guide from '../components/Guide';
 import AdminView from '../components/AdminView';
 import EventBanner from '../components/EventBanner';
 import NextPicker from '../components/NextPicker';
 import NoseBadge from '../components/ui/NoseBadge';
 import NoseSheet from '../components/NoseSheet';
+import StyleSheet from '../components/StyleSheet';
 import Intro from '../components/Intro';
 import Onboarding from '../components/Onboarding';
 import { exportBackup, exportCsv } from '../lib/export';
-import { applyTheme, CUP_KEY, isCupChoice, THEME_KEY, themeById, type CupChoice } from '../lib/themes';
+import { applyTheme, CUP_KEY, DEFAULT_THEME, isCupChoice, THEME_KEY, themeById, type CupChoice } from '../lib/themes';
 import Avatar from '../components/ui/Avatar';
 import CountUp from '../components/ui/CountUp';
 import ShinyText from '../components/ui/ShinyText';
@@ -72,9 +73,10 @@ export default function Home() {
   const [route, setRoute] = useState<RouteRequest | null>(null);
   const [firstName, setFirstName] = useState(false);
   const [guide, setGuide] = useState(false);
-  const [theme, setTheme] = useState('marktnacht');
+  const [theme, setTheme] = useState(DEFAULT_THEME);
   const [cup, setCup] = useState<CupChoice>('auto');
   const [mapOpen, setMapOpen] = useState(true);
+  const [styleOpen, setStyleOpen] = useState(false);
   const [standsVersion, setStandsVersion] = useState(0);
   const [adminKey, setAdminKey] = useState('');
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null);
@@ -157,7 +159,7 @@ export default function Home() {
       if (isNew) setOnboard(true);
       try {
         const t = localStorage.getItem(THEME_KEY);
-        if (t) { setTheme(themeById(t).id); applyTheme(themeById(t)); }
+        setTheme(themeById(t).id); applyTheme(themeById(t));
         const cp = localStorage.getItem(CUP_KEY);
         if (isCupChoice(cp)) setCup(cp);
         if (localStorage.getItem(MAP_KEY) === 'zu') setMapOpen(false);
@@ -344,7 +346,7 @@ export default function Home() {
       <a className="skip-link" href="#inhalt">Zum Inhalt springen</a>
       <BackgroundScene palette={themeById(theme).scene} />
       {intro && <Intro slogan={slogans[slogan]} onDone={finishIntro} />}
-      {onboard && <Onboarding theme={theme} onTheme={chooseTheme} onName={nameFromOnboarding} onDone={finishOnboarding} />}
+      {onboard && <Onboarding theme={theme} onTheme={chooseTheme} cup={cup} onCup={chooseCup} onName={nameFromOnboarding} onDone={finishOnboarding} />}
       {(syncProblem || flashLive) && !gate && (
         <button type="button" className={`status-pill ${syncProblem ? 'warn' : 'ok'}`} onClick={() => changeView('group')} role="status">
           {syncProblem ? <WifiOff size={14} /> : <Wifi size={14} />}
@@ -377,7 +379,8 @@ export default function Home() {
               {isNose && <button type="button" className="nose-btn" onClick={() => setNoseOpen(true)}><span aria-hidden="true">👃</span> Nasenmeister-Ansage</button>}
             </div>
             <div className="hero-cup">
-              <WinterCup variant={cup === 'auto' ? themeById(theme).cup : cup} />
+              <WinterCup variant={cup === 'auto' ? themeById(theme).cup : cup} light={!!themeById(theme).light} />
+              <button type="button" className="style-chip" onClick={() => setStyleOpen(true)}><Palette size={15} aria-hidden="true" /> Design & Tasse</button>
             </div>
           </section>
 
@@ -510,12 +513,7 @@ export default function Home() {
           {people.length > 0 && <ul className="people">
             {people.map(p => <li key={p.id}><Avatar name={p.name} size={38} /><span className="person"><strong>{p.name}{p.id === meta.nasenmeisterId && <NoseBadge compact />}{p.id === profile.id && <span className="you">Du</span>}</strong><small>{plural(p.count, 'Stand', 'Stände')} bewertet · im Schnitt {formatScore(p.avg)}</small></span><span className="progress"><i style={{ width: `${(p.count / stands.length) * 100}%` }} /></span></li>)}
           </ul>}
-          <section className="card design-card">
-            <div className="card-head"><h2>Design</h2><span className="pill">nur auf deinem Handy</span></div>
-            <ThemePicker value={theme} onChange={chooseTheme} />
-            <div className="cup-head"><strong>Deine Tasse</strong><small>Wechselt mit dem Design, außer du legst eine fest.</small></div>
-            <CupPicker value={cup} theme={theme} onChange={chooseCup} />
-          </section>
+          <button type="button" className="btn ghost wide" onClick={() => setStyleOpen(true)}><Palette size={17} /> Design & Tasse ändern</button>
           <button type="button" className="btn ghost wide" onClick={() => setGuide(true)}><BookOpen size={17} /> Anleitung & Handy-Check</button>
           <section className="card export-card">
             <div className="card-head"><h2>Sichern</h2><span className="pill">{plural(reviews.length, 'Bewertung', 'Bewertungen')}</span></div>
@@ -565,6 +563,7 @@ export default function Home() {
       {openStand && <StandSheet key={openStand.id} stand={openStand} reviews={byStand[openStand.id]} ownId={profile.id} nasenId={meta.nasenmeisterId} isCurrent={openStand.id === now} onHere={() => moveHere(openStand.id)} onRoute={() => startRoute(openStand.id)} onClose={() => setOpenStand(null)} onRate={() => { const s = openStand; setOpenStand(null); startRating(s); }} onDelete={deleteRating} onPhoto={(src, label) => setLightbox({ src, label })} />}
       {activeEvent && !gate && <EventBanner key={activeEvent.id} event={activeEvent} stand={activeEvent.standId ? stands.find(x => x.id === activeEvent.standId) : undefined} podium={podium}
         onRoute={id => startRoute(id)} onClose={() => dismissEvent(activeEvent.id)} />}
+      {styleOpen && <StyleSheet theme={theme} cup={cup} onTheme={chooseTheme} onCup={chooseCup} onClose={() => setStyleOpen(false)} />}
       {noseOpen && store && <NoseSheet onClose={() => setNoseOpen(false)} onSend={async (title, body) => {
         try { await store.sendEvent({ kind: 'nase', title, body, standId: null, endsAt: null }); notify('Ansage an alle geschickt.'); }
         catch (e) { notify(e instanceof Error ? e.message : 'Senden hat nicht geklappt.'); throw e; }

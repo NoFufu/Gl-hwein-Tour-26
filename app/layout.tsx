@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import '@fontsource-variable/fraunces';
+import '@fontsource-variable/inter';
 import '@fontsource-variable/instrument-sans';
 import '@fontsource-variable/bricolage-grotesque';
 import '@fontsource-variable/fredoka';
@@ -20,5 +21,5 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: 'Glühwein 26', statusBarStyle: 'black-translucent' },
   formatDetection: { telephone: false },
 };
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#120e16' };
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#0e0f12' };
 export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) { return <html lang="de" data-ui="2026" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: themeBootScript }} /></head><body>{children}<PwaRegister /></body></html> }

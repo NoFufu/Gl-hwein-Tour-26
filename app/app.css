@@ -779,7 +779,7 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 /* ═════════ Taste-Skill: Überschriften-Schrift, kein Glow, kein Verlaufstext ═════════ */
 /* Fraunces ist laut Skill ein typischer KI-Default. Marktnacht/Tannenwald: Bricolage Grotesque (warm, eigenwillig),
    Polarlicht: Outfit. Zuckerstange (Fredoka) und Schneekugel (Playfair) behalten ihre Schrift. */
-:root[data-ui]:not([data-theme="zuckerstange"]):not([data-theme="schnee"]):not([data-theme="mitternacht"]) { --display: 'Bricolage Grotesque Variable', system-ui, sans-serif; }
+:root[data-ui]:not([data-theme="zuckerstange"]):not([data-theme="schnee"]):not([data-theme="mitternacht"]):not([data-theme="clean"]) { --display: 'Bricolage Grotesque Variable', system-ui, sans-serif; }
 :root[data-ui][data-theme="mitternacht"] { --display: 'Outfit Variable', system-ui, sans-serif; }
 [data-ui] h1, [data-ui] h2 { font-weight: 700; letter-spacing: -.025em; }
 [data-ui] .hero h1 { font-weight: 800; letter-spacing: -.035em; line-height: .98; }
@@ -841,3 +841,30 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 
 /* Inhalt immer über der Hintergrund-Szene: ohne Einblend-Animation (Bewegung reduziert) lag die Szene sonst über statischen Karten und schluckte Taps */
 .content { position: relative; z-index: 1; }
+
+/* Design „Clean“ (Dark Mode): eine Schrift (Inter), klare Kanten, dunkle Flächen mit feinen Linien, keine Effekte */
+:root[data-theme="clean"], :root[data-ui][data-theme="clean"] {
+  --display: 'Inter Variable', system-ui, -apple-system, sans-serif; --text: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --radius: 14px; --radius-sm: 10px; --btn-radius: 10px;
+}
+[data-theme="clean"] h1, [data-theme="clean"] h2 { font-weight: 650; letter-spacing: -.035em; }
+[data-theme="clean"] .scene { background: var(--bg); }
+:root[data-ui][data-theme="clean"] :where(.card, .stats, .progress-card, .stand-card, .podium button, .people li, .guide-steps > li) {
+  background: #17181c; border-color: rgba(255, 255, 255, .07); box-shadow: none;
+}
+[data-theme="clean"] :where(.dock, .now-bar, .bottom-ui) { box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
+[data-theme="clean"] .slogan { font-style: normal; }
+[data-theme="clean"] .hero h1 em { font-style: normal; }
+[data-theme="clean"] .spotlight::before { display: none; }
+[data-theme="clean"] .shiny { letter-spacing: .12em; }
+:root[data-ui][data-theme="clean"] .hero h1 { --hero-fit: 4.4; }
+
+/* Design & Tasse: Knopf unter der Tasse auf der Startseite, Auswahl als Sheet */
+.style-chip { position: absolute; z-index: 2; left: calc(50% - 23px); bottom: -4px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: rgba(var(--panel-rgb), .82); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: var(--ink); font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); }
+.style-chip svg { color: var(--amber); }
+.style-chip:active { transform: translateX(-50%) scale(.97); }
+.style-sub { margin: 18px 0 8px; font: 600 16px var(--text); letter-spacing: 0; }
+.style-sheet .muted.small { margin: -4px 0 10px; font-size: 13px; }
+.style-sheet .cup-picker, .onboard .cup-picker { padding: 0; }
+.style-sheet .btn.wide { margin-top: 18px; }
+.onboard-sub { margin: 18px 0 8px; font-size: 18px; text-align: left; width: 100%; }
