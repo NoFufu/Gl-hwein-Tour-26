@@ -48,15 +48,10 @@ export const themes: Theme[] = [
     scene: { bg: 'globe', particles: 'snow', density: .7, particleAlpha: .85, additive: false, night: [.93, .94, .96], plum: [.86, .89, .94], glow: [.95, .6, .4], glow2: [.95, .6, .4], warm1: [.6, .68, .8], warm2: [.72, .78, .88], glowStrength: .6 },
   },
   {
-    // Ruhig und seriös: fast weiß, eine Schrift (Inter), ein dunkles Weinrot als einziger Akzent, keine Partikel
-    id: 'clean', cup: 'classic', name: 'Clean', hint: 'Klar, ruhig & seriös', light: true,
-    vars: {
-      '--bg': '#f5f5f3', '--bg-rgb': '245, 245, 243', '--ink': '#15171b', '--ink-rgb': '21, 23, 27', '--muted': '#5a5f67',
-      '--amber': '#8c1d2c', '--accent-rgb': '140, 29, 44', '--amber-ink': '#ffffff',
-      '--cranberry': '#8c1d2c', '--berry-rgb': '140, 29, 44', '--pine': '#2d6650', '--pine-rgb': '45, 102, 80', '--pine-deep': '#2d6650',
-      '--panel-rgb': '255, 255, 255', '--panel-solid': '#ffffff', '--scene-glow': '#ededeb', '--map-filter': 'grayscale(.6) contrast(.95)', 'color-scheme': 'light',
-    },
-    scene: { bg: 'clean', particles: 'snow', density: 0, particleAlpha: 0, additive: false, night: [.962, .962, .955], plum: [.93, .93, .925], glow: [1, 1, 1], glow2: [1, 1, 1], warm1: [1, 1, 1], warm2: [1, 1, 1], glowStrength: 0 },
+    // Ruhig und seriös, als Dark Mode: neutrales Anthrazit, eine Schrift (Inter), ein gedämpftes Rot als einziger Akzent, keine Partikel
+    id: 'clean', cup: 'classic', name: 'Clean', hint: 'Dark Mode, klar & seriös',
+    vars: dark({ bg: '#0e0f12', bgRgb: '14, 15, 18', ink: '#ededef', inkRgb: '237, 237, 239', muted: '#a0a4ac', accent: '#e8636f', accentRgb: '232, 99, 111', accentInk: '#1a0709', berry: '#e8636f', berryRgb: '232, 99, 111', pine: '#6fbf9b', pineRgb: '111, 191, 155', pineDeep: '#2c5a47', panelRgb: '23, 24, 28', panelSolid: '#17181c', sceneGlow: '#15161a' }),
+    scene: { bg: 'clean', particles: 'snow', density: 0, particleAlpha: 0, additive: false, night: [.055, .059, .07], plum: [.078, .082, .095], glow: [1, 1, 1], glow2: [1, 1, 1], warm1: [1, 1, 1], warm2: [1, 1, 1], glowStrength: 0 },
   },
 ];
 

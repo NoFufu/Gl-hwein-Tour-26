@@ -842,7 +842,7 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 /* Inhalt immer über der Hintergrund-Szene: ohne Einblend-Animation (Bewegung reduziert) lag die Szene sonst über statischen Karten und schluckte Taps */
 .content { position: relative; z-index: 1; }
 
-/* Design „Clean“: eine Schrift (Inter), klare Kanten, weiße Flächen mit feinen Linien, keine Effekte */
+/* Design „Clean“ (Dark Mode): eine Schrift (Inter), klare Kanten, dunkle Flächen mit feinen Linien, keine Effekte */
 :root[data-theme="clean"], :root[data-ui][data-theme="clean"] {
   --display: 'Inter Variable', system-ui, -apple-system, sans-serif; --text: 'Inter Variable', system-ui, -apple-system, sans-serif;
   --radius: 14px; --radius-sm: 10px; --btn-radius: 10px;
@@ -850,9 +850,9 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 [data-theme="clean"] h1, [data-theme="clean"] h2 { font-weight: 650; letter-spacing: -.035em; }
 [data-theme="clean"] .scene { background: var(--bg); }
 :root[data-ui][data-theme="clean"] :where(.card, .stats, .progress-card, .stand-card, .podium button, .people li, .guide-steps > li) {
-  background: #fff; border-color: rgba(21, 23, 27, .09); box-shadow: 0 1px 2px rgba(21, 23, 27, .04);
+  background: #17181c; border-color: rgba(255, 255, 255, .07); box-shadow: none;
 }
-[data-theme="clean"] :where(.dock, .now-bar, .bottom-ui) { box-shadow: 0 8px 24px rgba(21, 23, 27, .1); }
+[data-theme="clean"] :where(.dock, .now-bar, .bottom-ui) { box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
 [data-theme="clean"] .slogan { font-style: normal; }
 [data-theme="clean"] .hero h1 em { font-style: normal; }
 [data-theme="clean"] .spotlight::before { display: none; }
