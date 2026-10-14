@@ -14,7 +14,7 @@ import StyleSheet from '../components/StyleSheet';
 import Intro from '../components/Intro';
 import Onboarding from '../components/Onboarding';
 import { exportBackup, exportCsv } from '../lib/export';
-import { applyTheme, CUP_KEY, isCupChoice, THEME_KEY, themeById, type CupChoice } from '../lib/themes';
+import { applyTheme, CUP_KEY, DEFAULT_THEME, isCupChoice, THEME_KEY, themeById, type CupChoice } from '../lib/themes';
 import Avatar from '../components/ui/Avatar';
 import CountUp from '../components/ui/CountUp';
 import ShinyText from '../components/ui/ShinyText';
@@ -73,7 +73,7 @@ export default function Home() {
   const [route, setRoute] = useState<RouteRequest | null>(null);
   const [firstName, setFirstName] = useState(false);
   const [guide, setGuide] = useState(false);
-  const [theme, setTheme] = useState('marktnacht');
+  const [theme, setTheme] = useState(DEFAULT_THEME);
   const [cup, setCup] = useState<CupChoice>('auto');
   const [mapOpen, setMapOpen] = useState(true);
   const [styleOpen, setStyleOpen] = useState(false);
@@ -159,7 +159,7 @@ export default function Home() {
       if (isNew) setOnboard(true);
       try {
         const t = localStorage.getItem(THEME_KEY);
-        if (t) { setTheme(themeById(t).id); applyTheme(themeById(t)); }
+        setTheme(themeById(t).id); applyTheme(themeById(t));
         const cp = localStorage.getItem(CUP_KEY);
         if (isCupChoice(cp)) setCup(cp);
         if (localStorage.getItem(MAP_KEY) === 'zu') setMapOpen(false);

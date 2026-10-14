@@ -18,6 +18,12 @@ const dark = (o: { bg: string; bgRgb: string; ink: string; inkRgb: string; muted
 
 export const themes: Theme[] = [
   {
+    // Ruhig und seriös, als Dark Mode: neutrales Anthrazit, eine Schrift (Inter), ein gedämpftes Rot als einziger Akzent, keine Partikel
+    id: 'clean', cup: 'classic', name: 'Clean', hint: 'Dark Mode, klar & seriös',
+    vars: dark({ bg: '#0e0f12', bgRgb: '14, 15, 18', ink: '#ededef', inkRgb: '237, 237, 239', muted: '#a0a4ac', accent: '#e8636f', accentRgb: '232, 99, 111', accentInk: '#1a0709', berry: '#e8636f', berryRgb: '232, 99, 111', pine: '#6fbf9b', pineRgb: '111, 191, 155', pineDeep: '#2c5a47', panelRgb: '23, 24, 28', panelSolid: '#17181c', sceneGlow: '#15161a' }),
+    scene: { bg: 'clean', particles: 'snow', density: 0, particleAlpha: 0, additive: false, night: [.055, .059, .07], plum: [.078, .082, .095], glow: [1, 1, 1], glow2: [1, 1, 1], warm1: [1, 1, 1], warm2: [1, 1, 1], glowStrength: 0 },
+  },
+  {
     id: 'marktnacht', cup: 'classic', name: 'Marktnacht', hint: 'Laternennebel & Bokeh',
     vars: dark({ bg: '#120e16', bgRgb: '18, 14, 22', ink: '#f7efe7', inkRgb: '255, 244, 236', muted: '#d2c6cc', accent: '#f3b66a', accentRgb: '243, 182, 106', accentInk: '#2a1708', berry: '#e05770', berryRgb: '224, 87, 112', pine: '#7cc3a5', pineRgb: '124, 195, 165', pineDeep: '#2d5a49', panelRgb: '24, 18, 28', panelSolid: '#1a141e', sceneGlow: '#3a1527' }),
     scene: { bg: 'fog', particles: 'bokeh', density: .42, particleAlpha: 1, additive: true, night: [.075, .055, .09], plum: [.24, .08, .16], glow: [.95, .62, .30], glow2: [.95, .62, .30], warm1: [1, .72, .42], warm2: [1, .45, .48], glowStrength: 1 },
@@ -47,16 +53,12 @@ export const themes: Theme[] = [
     },
     scene: { bg: 'globe', particles: 'snow', density: .7, particleAlpha: .85, additive: false, night: [.93, .94, .96], plum: [.86, .89, .94], glow: [.95, .6, .4], glow2: [.95, .6, .4], warm1: [.6, .68, .8], warm2: [.72, .78, .88], glowStrength: .6 },
   },
-  {
-    // Ruhig und seriös, als Dark Mode: neutrales Anthrazit, eine Schrift (Inter), ein gedämpftes Rot als einziger Akzent, keine Partikel
-    id: 'clean', cup: 'classic', name: 'Clean', hint: 'Dark Mode, klar & seriös',
-    vars: dark({ bg: '#0e0f12', bgRgb: '14, 15, 18', ink: '#ededef', inkRgb: '237, 237, 239', muted: '#a0a4ac', accent: '#e8636f', accentRgb: '232, 99, 111', accentInk: '#1a0709', berry: '#e8636f', berryRgb: '232, 99, 111', pine: '#6fbf9b', pineRgb: '111, 191, 155', pineDeep: '#2c5a47', panelRgb: '23, 24, 28', panelSolid: '#17181c', sceneGlow: '#15161a' }),
-    scene: { bg: 'clean', particles: 'snow', density: 0, particleAlpha: 0, additive: false, night: [.055, .059, .07], plum: [.078, .082, .095], glow: [1, 1, 1], glow2: [1, 1, 1], warm1: [1, 1, 1], warm2: [1, 1, 1], glowStrength: 0 },
-  },
 ];
 
 export const THEME_KEY = 'glueh26-theme';
-export const themeById = (id: string) => themes.find(t => t.id === id) || themes[0];
+/** Standard für alle, die noch kein Design gewählt haben. */
+export const DEFAULT_THEME = 'clean';
+export const themeById = (id: string | null | undefined) => themes.find(t => t.id === id) || themes.find(t => t.id === DEFAULT_THEME)!;
 export function applyTheme(theme: Theme) {
   const root = document.documentElement;
   for (const [k, v] of Object.entries(theme.vars)) root.style.setProperty(k, v);
@@ -64,7 +66,7 @@ export function applyTheme(theme: Theme) {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.vars['--bg']);
 }
 /** Läuft vor dem ersten Zeichnen (im <head>), damit kein falsches Farbschema aufblitzt. */
-export const themeBootScript = `try{var i=localStorage.getItem('${THEME_KEY}'),t=${JSON.stringify(Object.fromEntries(themes.map(t => [t.id, t.vars])))}[i];if(t){for(var k in t)document.documentElement.style.setProperty(k,t[k]);document.documentElement.dataset.theme=i}}catch(e){}`;
+export const themeBootScript = `try{var i=localStorage.getItem('${THEME_KEY}')||'${DEFAULT_THEME}',t=${JSON.stringify(Object.fromEntries(themes.map(t => [t.id, t.vars])))}[i];if(t){for(var k in t)document.documentElement.style.setProperty(k,t[k]);document.documentElement.dataset.theme=i}}catch(e){}`;
 
 /** Tassen zur freien Wahl. `auto` heißt: die Tasse wechselt mit dem Design. */
 export type CupChoice = CupVariant | 'auto';
