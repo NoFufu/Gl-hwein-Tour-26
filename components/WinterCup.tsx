@@ -26,7 +26,7 @@ const stripes = (a: string, b: string, n: number) => canvasTexture(256, 256, c =
 /** Punkt auf der Tassenwand: Winkel a (0 = vorne), Höhe y, kleiner Abstand nach außen. */
 const onWall = (a: number, y: number, r = .8) => new THREE.Vector3(Math.sin(a) * r, y, Math.cos(a) * r);
 
-export default function WinterCup({ variant = 'classic' }: { variant?: CupVariant }) {
+export default function WinterCup({ variant = 'classic', light = false }: { variant?: CupVariant; light?: boolean }) {
   const host = useRef<HTMLDivElement>(null), turn = useRef<(() => void) | null>(null);
   const [available, setAvailable] = useState(false);
   useEffect(() => {
@@ -255,13 +255,31 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
     }
 
     // Dampf und Schatten
-    const steam: THREE.Mesh[] = [];
-    for (let j = 0; j < 3; j++) {
-      const points = Array.from({ length: 18 }, (_, i) => { const y = i / 17; return new THREE.Vector3(Math.sin(y * 6 + j) * .11 + (j - 1) * .17, .85 + y * 1.25, -.1); });
-      const mesh = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 40, .009, 6, false), new THREE.MeshBasicMaterial({ color: 0xcabec3, transparent: true, opacity: .25, depthWrite: false }));
-      mug.add(mesh); steam.push(mesh);
-    }
-    mug.traverse(o => { if ((o as THREE.Mesh).isMesh && !steam.includes(o as THREE.Mesh)) { o.castShadow = true; o.receiveShadow = true; } });
+    // Dampf: zwei weiche Rauchfahnen aus Rauschen (Shader auf Flächen zur Kamera), steigen auf, wabern und lösen sich oben auf
+    const steamMat = (seed: number, strength: number) => new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false,
+      uniforms: { uTime: { value: 3 }, uSeed: { value: seed }, uColor: { value: new THREE.Color(light ? 0xa9a1a3 : 0xfff8f2) }, uOpacity: { value: (light ? .36 : .55) * strength } },
+      vertexShader: 'varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+      fragmentShader: `uniform float uTime, uSeed, uOpacity; uniform vec3 uColor; varying vec2 vUv;
+        float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+        float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+        float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n(p);p*=2.03;a*=.5;}return v;}
+        void main(){
+          float y=vUv.y, t=uTime+uSeed*7.;
+          // Fahne schwingt seitlich, nach oben stärker und breiter
+          float sway=(fbm(vec2(y*1.6-t*.35,uSeed))-.5)*.55*y+sin(y*4.-t*.9+uSeed*3.)*.05*y;
+          float x=vUv.x-.5-sway, w=.09+.26*y;
+          float column=exp(-x*x/(w*w));
+          vec2 p=vec2(vUv.x*2.6+uSeed, y*2.2-t*.5);
+          float d=fbm(p+vec2(fbm(p*1.4+t*.12),0.)*1.2);
+          float a=column*smoothstep(.0,.14,y)*smoothstep(.92,.3,y)*smoothstep(.28,.75,d);
+          gl_FragColor=vec4(uColor,a*uOpacity);
+        }`,
+    });
+    const steam = [new THREE.Mesh(new THREE.PlaneGeometry(1.35, 1.55), steamMat(.3, 1)), new THREE.Mesh(new THREE.PlaneGeometry(1.15, 1.4), steamMat(1.7, .8))];
+    steam[0].position.set(-.04, 1.4, -.05); steam[1].position.set(.18, 1.33, .05);
+    steam.forEach(s => { s.lookAt(camera.position.clone().setY(s.position.y)); s.userData.y = s.position.y; s.renderOrder = 2; scene.add(s); });
+    mug.traverse(o => { if ((o as THREE.Mesh).isMesh) { o.castShadow = true; o.receiveShadow = true; } });
     // Weicher Kontaktschatten (unscharfer Fleck) plus echter Schattenwurf des Lichts auf einer unsichtbaren Fläche
     const contactTex = canvasTexture(128, 128, c => { const g = c.createRadialGradient(64, 64, 2, 64, 64, 62); g.addColorStop(0, 'rgba(20,8,14,.42)'); g.addColorStop(.5, 'rgba(20,8,14,.14)'); g.addColorStop(1, 'rgba(20,8,14,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
     const contact = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.2), new THREE.MeshBasicMaterial({ map: contactTex, transparent: true, depthWrite: false }));
@@ -278,7 +296,7 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
       if (!reduced) {
         mug.rotation.y = -.32 + Math.sin(t * .35) * .12 + spin; spin *= Math.exp(-dt * 2.8);
         hop *= Math.exp(-dt * 3); mug.position.y = Math.sin(t * .75) * .025 + Math.abs(Math.sin(t * 9)) * hop * .25;
-        steam.forEach((s, i) => { s.rotation.y = Math.sin(t * .5 + i) * .1; (s.material as THREE.MeshBasicMaterial).opacity = .17 + Math.sin(t * .7 + i) * .05; });
+        steam.forEach(s => { (s.material as THREE.ShaderMaterial).uniforms.uTime.value = t; s.position.y = s.userData.y + mug.position.y; });
         if (charm) charm.rotation.z = charmBase + Math.sin(t * .8) * .08;
       }
       renderer.render(scene, camera);
@@ -294,6 +312,6 @@ export default function WinterCup({ variant = 'classic' }: { variant?: CupVarian
       scene.traverse(obj => { const m = obj as THREE.Mesh; m.geometry?.dispose(); if (m.material) (Array.isArray(m.material) ? m.material : [m.material]).forEach(mat => { (mat as THREE.MeshStandardMaterial).map?.dispose(); mat.dispose(); }); });
       envTex.dispose(); pmrem.dispose(); renderer.dispose(); renderer.domElement.remove();
     };
-  }, [variant]);
+  }, [variant, light]);
   return <button type="button" className="winter-cup" aria-label="3D-Glühweintasse antippen" onClick={() => turn.current?.()}><div ref={host} />{!available && <img src={asset('/illustrations/tasse.svg')} alt="Glühweintasse" className="cup-fallback" />}</button>;
 }

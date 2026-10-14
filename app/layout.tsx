@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import '@fontsource-variable/fraunces';
+import '@fontsource-variable/inter';
 import '@fontsource-variable/instrument-sans';
 import '@fontsource-variable/bricolage-grotesque';
 import '@fontsource-variable/fredoka';

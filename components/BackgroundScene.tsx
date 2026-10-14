@@ -6,7 +6,7 @@ import type { Theme } from '../lib/themes';
 // Hintergrund je Design: ein Vollbild-Shader (Nebel, Tannenwald, Polarlicht, Zuckerstange, Schneekugel)
 // plus Partikel (Bokeh, Schnee, Sterne, Glitzer). Reagiert sanft auf Finger und Maus.
 // Niedrige Auflösung, ~30 fps, pausiert im Hintergrund, bei reduzierter Bewegung nur ein Standbild.
-const BG_MODES = { fog: 0, forest: 1, aurora: 2, candy: 3, globe: 4 } as const;
+const BG_MODES = { fog: 0, forest: 1, aurora: 2, candy: 3, globe: 4, clean: 5 } as const;
 const PT_MODES = { bokeh: 0, snow: 1, stars: 2, sparkle: 3 } as const;
 export type SceneBg = keyof typeof BG_MODES;
 export type SceneParticles = keyof typeof PT_MODES;
@@ -61,6 +61,8 @@ void main(){
     col=mix(uNight,uPlum,s*.75);
     col+=uGlow*.07*pow(max(0.,sin(w*6.2831+.9)),12.)*uGlowStrength;
     col*=.85+.15*smoothstep(1.6,.2,length(uv-.5));
+  } else if(uMode>4.5){ // Clean: ruhiger, kaum sichtbarer Verlauf ohne Bewegung
+    col=mix(uPlum,uNight,smoothstep(0.,.7,uv.y));
   } else { // Schneekugel: hell, weiche Wolken
     col=mix(uPlum,uNight,smoothstep(0.,1.,uv.y));
     float c=fbm(uv*vec2(asp,1.)*1.6+vec2(t*.015,0.)+m*.1);
