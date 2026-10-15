@@ -106,7 +106,9 @@ h1, h2, .stats strong, .podium-score, .score-big > strong, .review-score, .rank-
 .map-tools { position: absolute; left: 12px; bottom: 30px; display: flex; gap: 8px; z-index: 3; }
 .map-tools button { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; border: 1px solid var(--line); background: rgba(var(--panel-rgb), .85); color: var(--ink); }
 .location-note { position: absolute; left: 10px; right: 10px; bottom: 82px; z-index: 4; margin: 0; padding: 10px 12px; border-radius: 12px; background: var(--panel-solid); border: 1px solid var(--line); font-size: 13px; }
-.map-marker { width: 38px; height: 38px; min-width: 44px; min-height: 44px; border-radius: 50%; border: 2px solid rgba(var(--ink-rgb), .85); background: var(--panel-solid); color: var(--ink); font-weight: 700; font-size: 13px; box-shadow: 0 4px 14px rgba(0, 0, 0, .45); }
+.map-marker { width: 28px; height: 28px; padding: 0; border-radius: 50%; border: 2px solid rgba(var(--ink-rgb), .85); background: var(--panel-solid); color: var(--ink); font-weight: 700; font-size: 11px; line-height: 1; box-shadow: 0 3px 10px rgba(0, 0, 0, .4); }
+/* Sichtbar klein, aber weiterhin 44 px Tippfläche */
+.map-marker::before { content: ''; position: absolute; inset: -8px; border-radius: 50%; }
 .map-marker.visited { background: var(--pine-deep); }
 .map-marker.selected { background: var(--amber); color: var(--amber-ink); border-color: #fff4e2; box-shadow: 0 0 0 6px rgba(var(--accent-rgb), .22), 0 0 24px rgba(var(--accent-rgb), .5); z-index: 4; }
 .maplibregl-ctrl-attrib { font-size: 10px !important; background: rgba(var(--bg-rgb), .7) !important; color: var(--muted); }
@@ -370,12 +372,11 @@ textarea { min-height: 84px; resize: vertical; }
 .tour-line { stroke: rgba(var(--ink-rgb), .45); stroke-width: 2; stroke-dasharray: 2 7; }
 .route-casing { stroke: rgba(var(--bg-rgb), .85); stroke-width: 9; }
 .route-line { stroke: var(--amber); stroke-width: 5; }
-.me-dot { width: 18px; height: 18px; border-radius: 50%; background: #5aa2ff; border: 3px solid #fff; box-shadow: 0 0 0 8px rgba(90, 162, 255, .25); }
+.me-dot { width: 16px; height: 16px; border-radius: 50%; background: #5aa2ff; border: 3px solid #fff; box-shadow: 0 0 0 7px rgba(90, 162, 255, .25); z-index: 5; }
 .map-marker.current:not(.selected) { border-color: var(--amber); box-shadow: 0 0 0 4px rgba(var(--accent-rgb), .35); }
 .map-marker.current { animation: here-pulse 2s ease-in-out infinite; }
-@keyframes here-pulse { 50% { box-shadow: 0 0 0 10px rgba(var(--accent-rgb), .08), 0 0 24px rgba(var(--accent-rgb), .45); } }
-.map-marker.visited { position: relative; }
-.map-marker.visited::after { content: '✓'; position: absolute; right: -4px; top: -4px; width: 17px; height: 17px; display: grid; place-items: center; border-radius: 50%; background: var(--pine); color: #0f1f18; font-size: 10px; font-weight: 800; border: 2px solid var(--panel-solid); }
+@keyframes here-pulse { 50% { box-shadow: 0 0 0 7px rgba(var(--accent-rgb), .08), 0 0 24px rgba(var(--accent-rgb), .45); } }
+.map-marker.visited::after { content: '✓'; position: absolute; right: -5px; top: -5px; width: 13px; height: 13px; display: grid; place-items: center; border-radius: 50%; background: var(--pine); color: #0f1f18; font-size: 8px; font-weight: 800; border: 1.5px solid var(--panel-solid); }
 .route-panel { position: absolute; left: 10px; right: 10px; bottom: 28px; z-index: 4; display: flex; align-items: center; gap: 12px; padding: 10px 8px 10px 14px; border-radius: 16px; background: rgba(var(--panel-rgb), .92); border: 1px solid var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .route-panel > svg { color: var(--amber); flex: none; }
 .route-panel > span { flex: 1; min-width: 0; display: grid; }
