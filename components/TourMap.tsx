@@ -17,6 +17,8 @@ function meters(a: LngLat, b: LngLat) {
   const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[1] * rad) * Math.cos(b[1] * rad) * Math.sin(dLng / 2) ** 2;
   return 2 * r * Math.asin(Math.sqrt(h));
 }
+/** Nah genug an der Tour, dass die Karte dem Standort folgen soll (gleiche Grenze wie bei der Route). */
+const nearTour = (at: LngLat | null) => !!at && stands.some(s => meters(at, s.coords as LngLat) < 4000);
 const fmtDistance = (m: number) => (m < 950 ? `${Math.round(m / 10) * 10} m` : `${(m / 1000).toFixed(1).replace('.', ',')} km`);
 const fmtMinutes = (s: number) => `${Math.max(1, Math.round(s / 60))} Min`;
 
@@ -60,7 +62,7 @@ function layoutStands(w: number, h: number): Pt[] {
     const x = offX + (r.x - minX) * scale, y = offY + (r.y - minY) * scale;
     return { id: r.id, x, y, ox: x, oy: y };
   });
-  const minD = 54;
+  const minD = 40;
   for (let it = 0; it < 120; it++) {
     for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
       let vx = pts[j].x - pts[i].x, vy = pts[j].y - pts[i].y, d = Math.hypot(vx, vy);
@@ -111,7 +113,10 @@ export default function TourMap({ selected, current, ratedIds, route, onSelect, 
   const [overlay, setOverlay] = useState<HTMLElement | null>(null), [frame, setFrame] = useState(0);
   const [note, setNote] = useState(''), [locating, setLocating] = useState(false);
   const [info, setInfo] = useState<RouteInfo | null>(null);
+  // Folgen: Die Karte bleibt auf dem eigenen Standort, bis man sie selbst verschiebt. Der Standort-Knopf schaltet es wieder ein.
+  const follow = useRef(true), here = useRef<LngLat | null>(null), routeOpen = useRef(false);
   select.current = onSelect;
+  routeOpen.current = !!route;
 
   useEffect(() => {
     if (!host.current) return;
@@ -152,6 +157,7 @@ export default function TourMap({ selected, current, ratedIds, route, onSelect, 
         m.fitBounds(tourBounds(), { padding: 40, maxZoom: 16.5, duration: 0 });
       });
       m.on('move', () => setFrame(f => f + 1));
+      m.on('dragstart', () => { follow.current = false; });
       m.on('error', () => { if (!m.isStyleLoaded()) setFailed(true); });
     } catch { setFailed(true); }
     return () => { clearTimeout(timer); markers.current.forEach(x => x.remove()); markers.current = []; map.current?.remove(); map.current = null; };
@@ -168,17 +174,33 @@ export default function TourMap({ selected, current, ratedIds, route, onSelect, 
   }, [selected, current, ratedIds, loaded]);
 
   useEffect(() => {
-    if (!loaded || route) return;
+    if (!loaded || route || (follow.current && nearTour(here.current))) return;
     map.current?.easeTo({ center: coordsOf(selected), duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 450 });
   }, [selected, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function showMe(at: LngLat) {
     if (!map.current) return;
-    me.current?.remove();
+    if (me.current) { me.current.setLngLat(at); return; }
     const dot = document.createElement('span');
     dot.className = 'me-dot';
     me.current = new maplibregl.Marker({ element: dot }).setLngLat(at).addTo(map.current);
   }
+
+  // Standort laufend beobachten und die Karte mitführen (nur in der Nähe der Tour, sonst bleibt die Übersicht).
+  useEffect(() => {
+    if (!loaded || !navigator.geolocation) return;
+    let first = true;
+    const id = navigator.geolocation.watchPosition(p => {
+      const at: LngLat = [p.coords.longitude, p.coords.latitude];
+      here.current = at;
+      showMe(at);
+      if (!follow.current || routeOpen.current || !nearTour(at) || !map.current) return;
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      map.current.easeTo({ center: at, zoom: first ? 16.5 : map.current.getZoom(), duration: still ? 0 : first ? 600 : 400 });
+      first = false;
+    }, () => {}, { enableHighAccuracy: true, maximumAge: 5000 });
+    return () => navigator.geolocation.clearWatch(id);
+  }, [loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!route) { setInfo(null); return; }
@@ -215,6 +237,8 @@ export default function TourMap({ selected, current, ratedIds, route, onSelect, 
     setLocating(false);
     if (!at) { setNote('Standort nicht verfügbar. Wähle deinen Stopp direkt auf der Karte.'); return; }
     setNote('');
+    here.current = at;
+    follow.current = true;
     showMe(at);
     map.current?.easeTo({ center: at, zoom: 16.5 });
   }
@@ -239,7 +263,7 @@ export default function TourMap({ selected, current, ratedIds, route, onSelect, 
       {failed && <SchemeMap selected={selected} current={current} ratedIds={ratedIds} onSelect={onSelect} />}
       {!failed && !info && <div className="map-tools">
         <button type="button" aria-label="Meinen Standort anzeigen" disabled={locating} onClick={locate}>{locating ? <LoaderCircle className="spin" size={18} /> : <LocateFixed size={19} />}</button>
-        <button type="button" aria-label="Alle Tourstopps anzeigen" onClick={() => map.current?.fitBounds(tourBounds(), { padding: 40, maxZoom: 16.5, duration: 400 })}><RotateCcw size={18} /></button>
+        <button type="button" aria-label="Alle Tourstopps anzeigen" onClick={() => { follow.current = false; map.current?.fitBounds(tourBounds(), { padding: 40, maxZoom: 16.5, duration: 400 }); }}><RotateCcw size={18} /></button>
       </div>}
       {info && route && <div className="route-panel" role="status">
         <Footprints size={18} />
