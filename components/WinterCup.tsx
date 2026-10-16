@@ -25,10 +25,17 @@ const stripes = (a: string, b: string, n: number) => canvasTexture(256, 256, c =
 });
 /** Punkt auf der Tassenwand: Winkel a (0 = vorne), Höhe y, kleiner Abstand nach außen. */
 const onWall = (a: number, y: number, r = .8) => new THREE.Vector3(Math.sin(a) * r, y, Math.cos(a) * r);
+/** Tassen, die in Blender (Cycles) als Drehung vorgerendert sind: Anzahl Bilder pro Umdrehung unter /tassen3d/<variante>/NN.webp.
+ *  Three.js zeichnet für sie nur noch den Dampf; Kamera und Maßstab entsprechen der Blender-Szene. */
+const PRERENDERED: Partial<Record<CupVariant, number>> = { classic: 36 };
+/** etwas kleiner zeigen, damit Zimtstange und Henkel nicht in den Titel ragen (Bild und Dampf-Kamera gleich skaliert) */
+const PHOTO_SCALE = .88;
+const frameSrc = (variant: CupVariant, i: number) => asset(`/tassen3d/${variant}/${String(i).padStart(2, '0')}.webp`);
 
 export default function WinterCup({ variant = 'classic', light = false }: { variant?: CupVariant; light?: boolean }) {
-  const host = useRef<HTMLDivElement>(null), turn = useRef<(() => void) | null>(null);
+  const host = useRef<HTMLDivElement>(null), turn = useRef<(() => void) | null>(null), photo = useRef<HTMLImageElement>(null);
   const [available, setAvailable] = useState(false);
+  const frames = PRERENDERED[variant] ?? 0;
   useEffect(() => {
     if (!host.current) return;
     let renderer: THREE.WebGLRenderer; let raf = 0, disposed = false;
@@ -42,12 +49,17 @@ export default function WinterCup({ variant = 'classic', light = false }: { vari
     const envTex = pmrem.fromScene(new RoomEnvironment(), .04).texture;
     scene.environment = envTex;
     const camera = new THREE.PerspectiveCamera(32, 230 / 260, .1, 50); camera.position.set(0, 2.3, 7.6); camera.lookAt(0, .15, 0);
+    // Vorgerenderte Tasse: gleiche Kamera wie in Blender, damit der Dampf genau aus der Öffnung steigt
+    if (frames) { camera.fov = 26; camera.position.set(0, 2.1, 7.6); camera.lookAt(.12, .12, 0); camera.updateProjectionMatrix(); }
+    const unitsPerHeight = 2 * camera.position.length() * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    // übrige Bilder der Drehung im Hintergrund laden, damit das Antippen sofort flüssig dreht
+    const preload = frames ? Array.from({ length: frames - 1 }, (_, i) => { const im = new Image(); im.decoding = 'async'; im.src = frameSrc(variant, i + 1); return im; }) : [];
     // Zeichenfläche immer in der echten Größe des Platzes: so wird die Tasse nie gestaucht oder gestreckt.
     const fit = () => {
       const w = Math.max(1, target.clientWidth), h = Math.max(1, target.clientHeight);
       renderer.setSize(w, h, false); camera.aspect = w / h;
       // Bei schmalem Platz etwas zurückzoomen, damit Henkel und Dampf ins Bild passen.
-      camera.zoom = Math.min(1, (w / h) / (230 / 260)); camera.updateProjectionMatrix();
+      camera.zoom = Math.min(1, (w / h) / (230 / 260)) * (frames ? PHOTO_SCALE : 1); camera.updateProjectionMatrix();
       renderer.render(scene, camera);
     };
     const sizeObserver = new ResizeObserver(fit);
@@ -280,15 +292,24 @@ export default function WinterCup({ variant = 'classic', light = false }: { vari
     steam[0].position.set(-.04, 1.4, -.05); steam[1].position.set(.18, 1.33, .05);
     steam.forEach(s => { s.lookAt(camera.position.clone().setY(s.position.y)); s.userData.y = s.position.y; s.renderOrder = 2; scene.add(s); });
     mug.traverse(o => { if ((o as THREE.Mesh).isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    if (frames) { mug.visible = false; steam[0].position.set(.02, 1.42, -.05); steam[1].position.set(.22, 1.35, .05); steam.forEach(s => { s.lookAt(camera.position.clone().setY(s.position.y)); s.userData.y = s.position.y; }); }
     // Weicher Kontaktschatten (unscharfer Fleck) plus echter Schattenwurf des Lichts auf einer unsichtbaren Fläche
     const contactTex = canvasTexture(128, 128, c => { const g = c.createRadialGradient(64, 64, 2, 64, 64, 62); g.addColorStop(0, 'rgba(20,8,14,.42)'); g.addColorStop(.5, 'rgba(20,8,14,.14)'); g.addColorStop(1, 'rgba(20,8,14,0)'); c.fillStyle = g; c.fillRect(0, 0, 128, 128); });
     const contact = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.2), new THREE.MeshBasicMaterial({ map: contactTex, transparent: true, depthWrite: false }));
-    contact.rotation.x = -Math.PI / 2; contact.position.set(.12, -.9, 0); scene.add(contact);
+    contact.rotation.x = -Math.PI / 2; contact.position.set(.12, -.9, 0); if (!frames) scene.add(contact);
     const catcher = new THREE.Mesh(new THREE.PlaneGeometry(8, 8), new THREE.ShadowMaterial({ opacity: .28 }));
-    catcher.rotation.x = -Math.PI / 2; catcher.position.y = -.91; catcher.receiveShadow = true; scene.add(catcher);
+    catcher.rotation.x = -Math.PI / 2; catcher.position.y = -.91; catcher.receiveShadow = true; if (!frames) scene.add(catcher);
+    let shown = 0;
+    const showPhoto = () => {
+      const img = photo.current; if (!img) return;
+      // Drehung = Bildnummer, Schweben und Hüpfen = Verschiebung in Pixeln
+      const i = ((Math.round(spin / (Math.PI * 2) * frames) % frames) + frames) % frames;
+      if (i !== shown) { shown = i; img.src = frameSrc(variant, i); }
+      img.style.transform = `translateY(${(-mug.position.y / unitsPerHeight) * target.clientHeight * PHOTO_SCALE}px) scale(${PHOTO_SCALE})`;
+    };
 
     let spin = 0, last = 0, hop = 0;
-    turn.current = () => { spin += Math.PI * 2; hop = 1; if (reduced) { mug.rotation.y += .4; renderer.render(scene, camera); } else if (!raf) raf = requestAnimationFrame(frame); };
+    turn.current = () => { spin += Math.PI * 2; hop = 1; if (reduced) { if (frames) { spin = 0; return; } mug.rotation.y += .4; renderer.render(scene, camera); } else if (!raf) raf = requestAnimationFrame(frame); };
     const charmBase = charm?.rotation.z ?? 0;
     function frame(time = 0) {
       raf = 0; if (disposed) return;
@@ -298,6 +319,7 @@ export default function WinterCup({ variant = 'classic', light = false }: { vari
         hop *= Math.exp(-dt * 3); mug.position.y = Math.sin(t * .75) * .025 + Math.abs(Math.sin(t * 9)) * hop * .25;
         steam.forEach(s => { (s.material as THREE.ShaderMaterial).uniforms.uTime.value = t; s.position.y = s.userData.y + mug.position.y; });
         if (charm) charm.rotation.z = charmBase + Math.sin(t * .8) * .08;
+        if (frames) showPhoto();
       }
       renderer.render(scene, camera);
       if (!reduced && !document.hidden) raf = requestAnimationFrame(frame);
@@ -310,8 +332,10 @@ export default function WinterCup({ variant = 'classic', light = false }: { vari
     return () => {
       disposed = true; cancelAnimationFrame(raf); observer.disconnect(); sizeObserver.disconnect(); document.removeEventListener('visibilitychange', visibility); turn.current = null;
       scene.traverse(obj => { const m = obj as THREE.Mesh; m.geometry?.dispose(); if (m.material) (Array.isArray(m.material) ? m.material : [m.material]).forEach(mat => { (mat as THREE.MeshStandardMaterial).map?.dispose(); mat.dispose(); }); });
-      envTex.dispose(); pmrem.dispose(); renderer.dispose(); renderer.domElement.remove();
+      envTex.dispose(); pmrem.dispose(); renderer.dispose(); renderer.domElement.remove(); preload.length = 0;
     };
-  }, [variant, light]);
-  return <button type="button" className="winter-cup" aria-label="3D-Glühweintasse antippen" onClick={() => turn.current?.()}><div ref={host} />{!available && <img src={asset('/illustrations/tasse.svg')} alt="Glühweintasse" className="cup-fallback" />}</button>;
+  }, [variant, light, frames]);
+  return <button type="button" className="winter-cup" aria-label="3D-Glühweintasse antippen" onClick={() => turn.current?.()}>
+    {frames > 0 && <img ref={photo} src={frameSrc(variant, 0)} alt="" className="cup-photo" style={{ transform: `scale(${PHOTO_SCALE})` }} draggable={false} />}
+    <div ref={host} />{!available && !frames && <img src={asset('/illustrations/tasse.svg')} alt="Glühweintasse" className="cup-fallback" />}</button>;
 }
