@@ -53,13 +53,12 @@ void main(){
       float rays=.45+.55*n(vec2(x*16.+fi*11.,t*.35));
       col+=mix(uGlow,uGlow2,fi/2.)*curtain*rays*(.42-fi*.08)*uGlowStrength;
     }
-  } else if(uMode<3.5){ // Zuckerstange: langsam drehender Lolli-Wirbel
+  } else if(uMode<3.5){ // Zuckerstange: ruhiger, kaum sichtbarer Lolli-Wirbel (weiche Streifen, wenig Kontrast)
     vec2 p=(uv-vec2(1.05,1.15)-m*.06)*vec2(asp,1.);
     float r=length(p), a=atan(p.y,p.x);
-    float w=a/6.2831*4.+r*2.2-t*.07+.06*sin(r*5.-t*.6);
-    float s=smoothstep(.35,.65,.5+.5*sin(w*6.2831));
-    col=mix(uNight,uPlum,s*.75);
-    col+=uGlow*.07*pow(max(0.,sin(w*6.2831+.9)),12.)*uGlowStrength;
+    float w=a/6.2831*3.+r*1.6-t*.035+.04*sin(r*4.-t*.4);
+    float s=smoothstep(.15,.85,.5+.5*sin(w*6.2831));
+    col=mix(uNight,uPlum,s*.32+smoothstep(1.4,.0,r)*.25);
     col*=.85+.15*smoothstep(1.6,.2,length(uv-.5));
   } else if(uMode>4.5){ // Clean: ruhiger, kaum sichtbarer Verlauf ohne Bewegung
     col=mix(uPlum,uNight,smoothstep(0.,.7,uv.y));
