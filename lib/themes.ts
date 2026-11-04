@@ -39,9 +39,15 @@ export const themes: Theme[] = [
     scene: { bg: 'aurora', particles: 'stars', density: .6, particleAlpha: .9, additive: true, night: [.02, .03, .08], plum: [.06, .1, .24], glow: [.25, .95, .65], glow2: [.5, .45, 1], warm1: [.85, .9, 1], warm2: [1, .9, .75], glowStrength: 1 },
   },
   {
-    id: 'zuckerstange', cup: 'zucker', name: 'Zuckerstange', hint: 'Pfefferminz & sanfte Streifen',
-    vars: dark({ bg: '#170b0e', bgRgb: '23, 11, 14', ink: '#fff0ee', inkRgb: '255, 240, 238', muted: '#e4c8ca', accent: '#f2737a', accentRgb: '242, 115, 122', accentInk: '#2a0306', berry: '#ffc06e', berryRgb: '255, 192, 110', pine: '#8fd6aa', pineRgb: '143, 214, 170', pineDeep: '#2f6a45', panelRgb: '33, 17, 21', panelSolid: '#241418', sceneGlow: '#3a171d' }),
-    scene: { bg: 'candy', particles: 'sparkle', density: .1, particleAlpha: .45, additive: true, night: [.09, .04, .05], plum: [.2, .07, .09], glow: [1, .85, .8], glow2: [1, .85, .8], warm1: [1, 1, 1], warm2: [1, .85, .55], glowStrength: 1 },
+    // Frost: eisiges Hellblau, weiße Karten wie Eisplatten, Marineblau als Schrift und Leiste, breite geometrische Überschriften
+    id: 'frost', cup: 'eisbaer', name: 'Frost', hint: 'Eisig hell & klar', light: true,
+    vars: {
+      '--bg': '#e4eef6', '--bg-rgb': '228, 238, 246', '--ink': '#0e2236', '--ink-rgb': '14, 34, 54', '--muted': '#3d5670',
+      '--amber': '#1d4fd8', '--accent-rgb': '29, 79, 216', '--amber-ink': '#ffffff',
+      '--cranberry': '#c62845', '--berry-rgb': '198, 40, 69', '--pine': '#0f7a5c', '--pine-rgb': '15, 122, 92', '--pine-deep': '#0f7a5c',
+      '--panel-rgb': '255, 255, 255', '--panel-solid': '#ffffff', '--scene-glow': '#f4f9fd', '--map-filter': 'saturate(.4) hue-rotate(-10deg) brightness(1.05)', 'color-scheme': 'light',
+    },
+    scene: { bg: 'globe', particles: 'snow', density: .55, particleAlpha: .9, additive: false, night: [.93, .96, .985], plum: [.8, .88, .95], glow: [.55, .75, 1], glow2: [.55, .75, 1], warm1: [.62, .76, .9], warm2: [.75, .85, .95], glowStrength: .5 },
   },
   {
     id: 'schnee', cup: 'schneemann', name: 'Schneekugel', hint: 'Hell, Wolken & Flocken', light: true,
@@ -58,7 +64,9 @@ export const themes: Theme[] = [
 export const THEME_KEY = 'glueh26-theme';
 /** Standard für alle, die noch kein Design gewählt haben. */
 export const DEFAULT_THEME = 'clean';
-export const themeById = (id: string | null | undefined) => themes.find(t => t.id === id) || themes.find(t => t.id === DEFAULT_THEME)!;
+/** Frühere Designs, die ersetzt wurden: wer sie gewählt hatte, bekommt den Nachfolger. */
+const RENAMED: Record<string, string> = { zuckerstange: 'frost' };
+export const themeById = (id: string | null | undefined) => { const k = (id && RENAMED[id]) || id; return themes.find(t => t.id === k) || themes.find(t => t.id === DEFAULT_THEME)!; };
 export function applyTheme(theme: Theme) {
   const root = document.documentElement;
   for (const [k, v] of Object.entries(theme.vars)) root.style.setProperty(k, v);
@@ -66,7 +74,7 @@ export function applyTheme(theme: Theme) {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.vars['--bg']);
 }
 /** Läuft vor dem ersten Zeichnen (im <head>), damit kein falsches Farbschema aufblitzt. */
-export const themeBootScript = `try{var i=localStorage.getItem('${THEME_KEY}')||'${DEFAULT_THEME}',t=${JSON.stringify(Object.fromEntries(themes.map(t => [t.id, t.vars])))}[i];if(t){for(var k in t)document.documentElement.style.setProperty(k,t[k]);document.documentElement.dataset.theme=i}}catch(e){}`;
+export const themeBootScript = `try{var i=localStorage.getItem('${THEME_KEY}')||'${DEFAULT_THEME}';i=${JSON.stringify(RENAMED)}[i]||i;var t=${JSON.stringify(Object.fromEntries(themes.map(t => [t.id, t.vars])))}[i];if(t){for(var k in t)document.documentElement.style.setProperty(k,t[k]);document.documentElement.dataset.theme=i}}catch(e){}`;
 
 /** Tassen zur freien Wahl. `auto` heißt: die Tasse wechselt mit dem Design. */
 export type CupChoice = CupVariant | 'auto';

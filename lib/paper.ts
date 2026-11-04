@@ -46,9 +46,13 @@ export const scenes: Record<string, Scene> = {
       ['#c9dcf0', c => `<path d="M0 176 l30 -22 18 10 26 -24 30 26 22 -14 30 20 24 -10 20 14 V240 H0Z" fill="${c}"/>`],
     ],
   },
-  zuckerstange: {
-    glow: [[0, '#fff1ea'], [.5, '#f5a6b0'], [1, '#7a2234']], frame: '#fff6f2', snow: '#ffffff', moon: '#ffffff',
-    layers: [['#e98a98', hills], ['#d4566c', sparrenburg], ['#a8233d', stalls('#ffe4b0')]],
+  frost: {
+    glow: [[0, '#f4f9fd'], [.5, '#9cc0e8'], [1, '#1d4fd8']], frame: '#ffffff', snow: '#ffffff', moon: '#ffffff',
+    layers: [
+      ['#cfe0f2', c => `<path d="M0 170 l26 -34 14 16 28 -40 30 38 18 -20 34 40 22 -18 28 26 V240 H0Z" fill="${c}"/>`],
+      ['#6f97c8', c => `<path d="M0 190 Q60 176 120 184 T200 178 V240 H0Z" fill="${c}"/>${[22, 54, 146, 178].map((x, i) => tree(x, 188, 1 + i % 2 * .25, c)).join('')}`],
+      ['#0e2236', stalls('#8fb4ff')],
+    ],
   },
   schnee: {
     glow: [[0, '#ffffff'], [.6, '#dce9f6'], [1, '#a9c4e0']], frame: '#ffffff', snow: '#ffffff', moon: '#fff4d6',

@@ -577,12 +577,6 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 [data-theme="mitternacht"] .stats strong { text-shadow: 0 0 18px rgba(var(--accent-rgb), .6); }
 [data-theme="mitternacht"] .dock button.active { box-shadow: 0 0 22px rgba(var(--accent-rgb), .55); }
 
-:root[data-theme="zuckerstange"] { --display: 'Fredoka Variable', system-ui, sans-serif; --radius: 26px; --radius-sm: 20px; --btn-radius: 99px; }
-[data-theme="zuckerstange"] h1, [data-theme="zuckerstange"] h2 { font-weight: 600; letter-spacing: -.01em; }
-[data-theme="zuckerstange"] .hero h1 em { font-style: normal; color: var(--amber); text-shadow: none; }
-/* Einziges Zuckerstangen-Detail: ein feiner, gedämpfter Streifen oben auf der Fortschrittskarte */
-[data-theme="zuckerstange"] .stats { position: relative; overflow: hidden; }
-[data-theme="zuckerstange"] .stats::before { content: ''; position: absolute; inset: 0 0 auto; height: 3px; background: repeating-linear-gradient(-45deg, var(--amber) 0 6px, rgba(255, 255, 255, .85) 6px 12px); opacity: .4; pointer-events: none; }
 
 :root[data-theme="schnee"] { --display: 'Playfair Display Variable', Georgia, serif; --radius: 20px; --radius-sm: 18px; --btn-radius: 12px; }
 [data-theme="schnee"] h1, [data-theme="schnee"] h2 { font-weight: 600; letter-spacing: -.015em; }
@@ -702,7 +696,6 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 /* Radien: 3 Stufen + Pillen-Buttons. Designs mit eigener Persönlichkeit behalten ihre Form. */
 :root[data-ui] { --radius: 24px; --radius-sm: 16px; --btn-radius: 999px; }
 :root[data-ui][data-theme="tannenwald"] { --radius: 14px; --radius-sm: 10px; --btn-radius: 10px; }
-:root[data-ui][data-theme="zuckerstange"] { --radius: 26px; --radius-sm: 18px; }
 [data-ui] .icon-btn, [data-ui] .map-tools button { border-radius: 999px; }
 
 /* Typo-Skala: Text 16, Eingaben 16 (kein iPhone-Zoom), feste Stufen für Titel */
@@ -791,13 +784,13 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 
 /* ═════════ Taste-Skill: Überschriften-Schrift, kein Glow, kein Verlaufstext ═════════ */
 /* Fraunces ist laut Skill ein typischer KI-Default. Marktnacht/Tannenwald: Bricolage Grotesque (warm, eigenwillig),
-   Polarlicht: Outfit. Zuckerstange (Fredoka) und Schneekugel (Playfair) behalten ihre Schrift. */
-:root[data-ui]:not([data-theme="zuckerstange"]):not([data-theme="schnee"]):not([data-theme="mitternacht"]):not([data-theme="clean"]) { --display: 'Bricolage Grotesque Variable', system-ui, sans-serif; }
+   Polarlicht: Outfit. Schneekugel (Playfair) und Frost (Unbounded) behalten ihre Schrift. */
+:root[data-ui]:not([data-theme="schnee"]):not([data-theme="mitternacht"]):not([data-theme="clean"]):not([data-theme="frost"]) { --display: 'Bricolage Grotesque Variable', system-ui, sans-serif; }
 :root[data-ui][data-theme="mitternacht"] { --display: 'Outfit Variable', system-ui, sans-serif; }
 [data-ui] h1, [data-ui] h2 { font-weight: 700; letter-spacing: -.025em; }
 [data-ui] .hero h1 { font-weight: 800; letter-spacing: -.035em; line-height: .98; }
 /* Betonung in derselben Schrift: Farbe statt (künstlicher) Kursive, kein Verlaufstext */
-:root[data-ui]:not([data-theme="zuckerstange"]) .hero h1 em { font-style: normal; color: var(--amber); background: none; -webkit-background-clip: border-box; background-clip: border-box; }
+:root[data-ui] .hero h1 em { font-style: normal; color: var(--amber); background: none; -webkit-background-clip: border-box; background-clip: border-box; }
 /* Kein Leuchten: Ringe statt Glow */
 [data-ui] .map-marker.current { animation: none; box-shadow: 0 0 0 3px var(--amber); }
 [data-ui] .map-marker.selected { box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .35); }
@@ -811,8 +804,6 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 .skip-link { position: absolute; left: 12px; top: -60px; z-index: 200; padding: 10px 14px; border-radius: 999px; background: var(--amber); color: var(--amber-ink); font-weight: 700; text-decoration: none; }
 .skip-link:focus { top: calc(10px + env(safe-area-inset-top)); }
 
-/* Zuckerstange: Fredoka braucht normale Laufweite, sonst wirken Überschriften gequetscht */
-[data-ui][data-theme="zuckerstange"] h1, [data-ui][data-theme="zuckerstange"] h2 { font-weight: 600; letter-spacing: 0; }
 
 /* Kopfzeile: Titel passt sich der Spaltenbreite an, statt am iPhone getrennt zu werden („Glüh-/wein“).
    --hero-fit = Breite von „Glühwein“ in em der jeweiligen Schrift, plus 5 % Reserve für Safari-Metriken. */
@@ -820,7 +811,6 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 [data-ui] .hero-copy { container-type: inline-size; min-width: 0; }
 [data-ui] .hero h1 { --hero-fit: 4.62; font-size: clamp(34px, calc(100cqi / var(--hero-fit)), 64px); hyphens: manual; -webkit-hyphens: manual; overflow-wrap: normal; white-space: nowrap; }
 :root[data-ui][data-theme="mitternacht"] .hero h1 { --hero-fit: 4.33; }
-:root[data-ui][data-theme="zuckerstange"] .hero h1 { --hero-fit: 4.37; }
 :root[data-ui][data-theme="schnee"] .hero h1 { --hero-fit: 4.43; }
 
 /* Stand-Karten: Foto als Streifen über die volle Kartenhöhe links, weicher Übergang in den Text */
@@ -932,3 +922,25 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 .danger-confirm p { display: flex; align-items: center; gap: 6px; font-size: 14px; }
 .danger-confirm p svg { color: var(--cranberry); }
 .danger-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Design „Frost“ (ersetzt Zuckerstange, Nov. 2026): eisiges Hellblau, weiße Eisplatten-Karten, Marineblau, breite geometrische Überschriften, Schneekristall */
+:root[data-ui][data-theme="frost"] { --display: 'Unbounded Variable', system-ui, sans-serif; --radius: 18px; --radius-sm: 14px; --btn-radius: 12px; --line: rgba(14, 34, 54, .14); }
+[data-ui][data-theme="frost"] h1, [data-ui][data-theme="frost"] h2 { font-weight: 650; letter-spacing: -.03em; }
+:root[data-ui][data-theme="frost"] .hero h1 { --hero-fit: 5.6; font-weight: 700; letter-spacing: -.04em; }
+[data-ui][data-theme="frost"] .card-head h2, [data-ui][data-theme="frost"] .section-head h2 { font-size: 19px; }
+[data-ui][data-theme="frost"] .page-head h1 { font-size: 32px; }
+[data-ui][data-theme="frost"] .hero::before { content: ''; position: absolute; right: -60px; top: -50px; width: 260px; height: 260px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cg stroke='%231d4fd8' stroke-width='2.2' stroke-linecap='round' fill='none'%3E%3Cg transform='rotate(0)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(120)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(180)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(240)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(300)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") no-repeat center / contain; opacity: .12; pointer-events: none; }
+:root[data-ui][data-theme="frost"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) {
+  background: linear-gradient(140deg, #ffffff 0%, rgba(255, 255, 255, .9) 45%, #eef5fb 100%); border: 1px solid #c3d6e6;
+  box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(14, 34, 54, .06), 0 10px 26px rgba(30, 70, 120, .1);
+}
+[data-ui][data-theme="frost"] .stand-card.is-now { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber), 0 10px 26px rgba(29, 79, 216, .16); }
+[data-ui][data-theme="frost"] .stand-main strong { font-family: var(--display); font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
+[data-ui][data-theme="frost"] .bottom-ui { --ink: #eef5fb; --ink-rgb: 238, 245, 251; --muted: #a9bfd4; --line: rgba(238, 245, 251, .14); background: #0e2236; color: var(--ink); border: 0; border-radius: 20px; box-shadow: 0 14px 34px rgba(14, 34, 54, .3); }
+[data-ui][data-theme="frost"] .bottom-ui .now-bar { background: rgba(238, 245, 251, .05); }
+[data-ui][data-theme="frost"] .bottom-ui .now-info small { color: #8fb4ff; }
+[data-ui][data-theme="frost"] .bottom-ui .btn.primary { background: #eef5fb; color: #0e2236; box-shadow: none; }
+[data-ui][data-theme="frost"] .bottom-ui .dock button.active { background: #1d4fd8; color: #fff; }
+[data-ui][data-theme="frost"] .bottom-ui .now-num { background: #eef5fb; color: #0e2236; }
+[data-ui][data-theme="frost"] .progress-track i { border-radius: 3px; }
+[data-ui][data-theme="frost"] .style-chip { background: #fff; border-color: #c3d6e6; }

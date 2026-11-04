@@ -12,7 +12,7 @@ Glühwein-Rot, ein Hauch Tannengrün.
 | **Airbnb** | Großzügig, freundlich, gerundet; Bewertungen als große, ruhige Zahl; Bilder führen, Typo bleibt bei mittleren Gewichten. | Weißer Canvas, Coral |
 | **Starbucks** | Wärme durch Materialfarben (Creme, Holz, Becher); Gold nur für „Zeremonie“-Momente (bei uns: Platz 1, Nasenmeister, Siegerehrung). | Grünes Vier-Ton-System |
 
-Die fünf Designs (Marktnacht, Tannenwald, Polarlicht, Zuckerstange, Schneekugel) teilen alle
+Die Designs (Clean, Marktnacht, Tannenwald, Polarlicht, Frost, Schneekugel) teilen alle
 Regeln unten; sie tauschen nur Farb-Tokens, Display-Schrift und Hintergrundszene.
 
 ---
@@ -42,7 +42,7 @@ Regeln
 
 ## 2. Typografie
 
-Display: **Bricolage Grotesque** (Marktnacht/Tannenwald) · Outfit (Polarlicht) · Fredoka (Zuckerstange) ·
+Display: **Bricolage Grotesque** (Marktnacht/Tannenwald) · Outfit (Polarlicht) · Unbounded (Frost) ·
 Playfair Display (Schneekugel). Betonung („26.“) per Farbe in derselben Schrift, keine Kursive, kein Verlauf. Text: **Instrument Sans** in allen Designs.
 
 | Stufe | Größe / Zeilenhöhe | Gewicht | Einsatz |
@@ -82,7 +82,7 @@ Regeln
 
 Buttons sind **Pillen** (freundlicher, „Event-Ticket“-Gefühl). Keine anderen Radien
 (heute: 12/14/16/18/20/22/24/26/30 gemischt). Designs dürfen die drei Stufen gemeinsam skalieren
-(Tannenwald kantiger, Zuckerstange runder).
+(Tannenwald kantiger, Clean schlichter).
 
 ## 5. Tiefe & Schatten
 
