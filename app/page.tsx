@@ -390,7 +390,7 @@ export default function Home() {
               <span>{plural(people.length, 'Person', 'Leute')} · {plural(reviews.length, 'Bewertung', 'Bewertungen')}</span>
             </div>
             <div className="progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={stands.length} aria-valuenow={ownRated.size}>
-              {stands.map(st => <i key={st.id} className={ownRated.has(st.id) ? 'on' : st.id === now ? 'now' : ''} />)}
+              {stands.map(st => <i key={st.id} className={ownRated.has(st.id) ? 'on' : st.id === now ? 'now' : ''}><span>{stopNumber(st.id)}</span></i>)}
             </div>
           </section>
 
@@ -469,7 +469,12 @@ export default function Home() {
               ))}
             </ol>
           </>}
-          {stands.length > ranked.length && <p className="fine">Noch ohne Bewertung: {stands.filter(s => !byStand[s.id].length).map(s => s.name).join(', ')}.</p>}
+          {stands.length > ranked.length && <section className="unrated" aria-labelledby="unrated-title">
+            <h2 id="unrated-title">Noch ohne Bewertung</h2>
+            <ul>{stands.filter(s => !byStand[s.id].length).map(s => (
+              <li key={s.id}><button type="button" onClick={() => setOpenStand(s)}><img src={s.thumb || s.image} alt="" width={44} height={44} loading="lazy" decoding="async" /><span><strong>{s.name}</strong><small>Stopp {stopNumber(s.id)} · {s.place}</small></span><ChevronRight size={18} aria-hidden="true" /></button></li>
+            ))}</ul>
+          </section>}
         </>}
 
         {!gate && view === 'photos' && <>
