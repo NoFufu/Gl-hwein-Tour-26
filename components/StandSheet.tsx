@@ -41,7 +41,7 @@ export default function StandSheet({ stand, reviews, ownId, nasenId, isCurrent, 
         <p className="sheet-place">{stand.place} · {stand.wine}</p>
 
         <section className="score-panel" aria-label="Gruppenwertung">
-          <div className="score-big">
+          <div className={`score-big${reviews.length ? '' : ' is-empty'}`}>
             <strong>{reviews.length ? <CountUp value={avg} decimals={1} /> : '–'}</strong>
             <div>
               <Stars value={avg} size={15} />
