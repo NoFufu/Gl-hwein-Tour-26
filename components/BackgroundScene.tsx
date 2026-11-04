@@ -3,10 +3,10 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { Theme } from '../lib/themes';
 
-// Hintergrund je Design: ein Vollbild-Shader (Nebel, Tannenwald, Polarlicht, Zuckerstange, Schneekugel)
+// Hintergrund je Design: ein Vollbild-Shader (Nebel, Tannenwald, Polarlicht, Schneekugel/Frost)
 // plus Partikel (Bokeh, Schnee, Sterne, Glitzer). Reagiert sanft auf Finger und Maus.
 // Niedrige Auflösung, ~30 fps, pausiert im Hintergrund, bei reduzierter Bewegung nur ein Standbild.
-const BG_MODES = { fog: 0, forest: 1, aurora: 2, candy: 3, globe: 4, clean: 5, lights: 6 } as const;
+const BG_MODES = { fog: 0, forest: 1, aurora: 2, globe: 4, clean: 5 } as const;
 const PT_MODES = { bokeh: 0, snow: 1, stars: 2, sparkle: 3 } as const;
 export type SceneBg = keyof typeof BG_MODES;
 export type SceneParticles = keyof typeof PT_MODES;
@@ -53,17 +53,6 @@ void main(){
       float rays=.45+.55*n(vec2(x*16.+fi*11.,t*.35));
       col+=mix(uGlow,uGlow2,fi/2.)*curtain*rays*(.42-fi*.08)*uGlowStrength;
     }
-  } else if(uMode<3.5){ // Zuckerstange: ruhiger, kaum sichtbarer Lolli-Wirbel (weiche Streifen, wenig Kontrast)
-    vec2 p=(uv-vec2(1.05,1.15)-m*.06)*vec2(asp,1.);
-    float r=length(p), a=atan(p.y,p.x);
-    float w=a/6.2831*3.+r*1.6-t*.035+.04*sin(r*4.-t*.4);
-    float s=smoothstep(.15,.85,.5+.5*sin(w*6.2831));
-    col=mix(uNight,uPlum,s*.32+smoothstep(1.4,.0,r)*.25);
-    col*=.85+.15*smoothstep(1.6,.2,length(uv-.5));
-  } else if(uMode>5.5){ // Lichterkette: fast schwarz, oben ein Hauch farbiger Lichtschein
-    col=mix(uPlum,uNight,smoothstep(0.,.55,1.-uv.y));
-    col+=uGlow*smoothstep(.55,0.,length((uv-vec2(.2,1.02))*vec2(asp,1.)))*.12*uGlowStrength;
-    col+=uGlow2*smoothstep(.6,0.,length((uv-vec2(.85,.98))*vec2(asp,1.)))*.1*uGlowStrength;
   } else if(uMode>4.5){ // Clean: ruhiger, kaum sichtbarer Verlauf ohne Bewegung
     col=mix(uPlum,uNight,smoothstep(0.,.7,uv.y));
   } else { // Schneekugel: hell, weiche Wolken
