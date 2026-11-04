@@ -77,10 +77,19 @@ h1, h2, .stats strong, .podium-score, .score-big > strong, .review-score, .rank-
 .hero h1 em { font-style: italic; color: var(--amber); font-weight: 500; }
 .hero p { color: var(--muted); max-width: 28ch; }
 .hero-cup { position: relative; height: 220px; }
-.winter-cup { position: absolute; inset: -10px 0 0 -46px; background: none; border: 0; padding: 0; touch-action: manipulation; }
-.winter-cup > div { width: 100%; height: 100%; }
-.winter-cup canvas { display: block; width: 100% !important; height: 100% !important; }
-.cup-fallback { position: absolute; inset: 20px; border-radius: 28px; object-fit: cover; }
+.paper-arch { position: absolute; inset: -10px 0 34px -6px; background: none; border: 0; padding: 0; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.paper-arch svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* Kippen: hintere Schichten wandern gegen, vordere mit der Bewegung (Tiefe --d, 0 = hinten) */
+.paper-arch .pl { transform: translate(calc(var(--px, 0) * (var(--d) - .55) * 9px), calc(var(--py, 0) * (var(--d) - .55) * 5px)); }
+.paper-arch .paper-steam path { animation: paper-steam 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+.paper-arch .paper-steam path + path { animation-delay: -1.6s; }
+.paper-arch .paper-flame { animation: paper-flame 1.9s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+.paper-arch .paper-flame:nth-of-type(2n) { animation-delay: -.8s; animation-duration: 2.3s; }
+.paper-arch.hop .paper-mug > g { animation: paper-hop .6s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes paper-steam { 0%, 100% { transform: translateY(0) scaleY(1); opacity: .95; } 50% { transform: translateY(-3px) scaleY(1.08) skewX(-6deg); opacity: .7; } }
+@keyframes paper-flame { 0%, 100% { transform: scale(1); } 40% { transform: scale(.88, 1.1); } 70% { transform: scale(1.06, .94); } }
+@keyframes paper-hop { 0% { transform: translate(104px, 150px) scale(1.05); } 35% { transform: translate(104px, 140px) scale(1.05) rotate(-4deg); } 100% { transform: translate(104px, 150px) scale(1.05); } }
+@media (prefers-reduced-motion: reduce) { .paper-arch .paper-steam path, .paper-arch .paper-flame, .paper-arch.hop .paper-mug > g { animation: none; } }
 
 /* Kennzahlen */
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
@@ -828,10 +837,10 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 .cup-picker { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 0 14px 14px; }
 .cup-picker button { position: relative; display: grid; justify-items: center; gap: 4px; padding: 10px 6px 8px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); text-align: center; }
 .cup-picker button.active { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber); }
-.cup-picker img { width: 64px; height: 64px; object-fit: contain; }
+.cup-picker .cup-icon, .cup-picker .cup-icon svg { display: block; width: 64px; height: 64px; }
 .cup-picker small { font-size: 12px; line-height: 1.2; color: var(--muted); }
 .cup-picker button.active small { color: var(--ink); }
-.cup-picker .is-auto img { filter: drop-shadow(0 0 10px rgba(var(--amber-rgb, 242, 178, 74), .45)); }
+.cup-picker .is-auto .cup-icon { filter: drop-shadow(0 0 10px rgba(var(--amber-rgb, 242, 178, 74), .45)); }
 
 /* Inhalt immer über der Hintergrund-Szene: ohne Einblend-Animation (Bewegung reduziert) lag die Szene sonst über statischen Karten und schluckte Taps */
 .content { position: relative; z-index: 1; }
@@ -871,6 +880,48 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 .style-sheet .cup-picker, .onboard .cup-picker { padding: 0; }
 .style-sheet .btn.wide { margin-top: 18px; }
 .onboard-sub { margin: 18px 0 8px; font-size: 18px; text-align: left; width: 100%; }
+
+/* Gruppe aufgeräumt (Nov. 2026): Mitglieder als zugeklappte Zeile, Code klein im Fließtext, Admin nur noch als Link */
+.crew { padding: 0; }
+.crew summary { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 16px; cursor: pointer; list-style: none; }
+.crew summary::-webkit-details-marker { display: none; }
+.crew-faces { display: flex; flex: none; }
+.crew-faces .avatar { box-shadow: 0 0 0 2px var(--bg); }
+.crew-faces .avatar + .avatar { margin-left: -9px; }
+.crew-names { flex: 1; min-width: 0; font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-chevron { flex: none; color: var(--muted); transition: transform .2s; }
+.crew[open] .crew-chevron { transform: rotate(180deg); }
+.crew .people { gap: 0; padding: 0 16px 8px; }
+:root .crew .people li, :root[data-ui] .crew .people li { padding: 10px 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; box-shadow: none; }
+.code-inline { color: var(--ink); font-weight: 600; letter-spacing: .04em; }
+.group-links { display: grid; justify-items: start; gap: 2px; }
+.admin-login { display: flex; gap: 8px; align-items: center; width: 100%; max-width: 320px; }
+.admin-login input { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 15px; }
+.rename-warn { padding: 10px 12px; border-radius: 12px; background: rgba(var(--accent-rgb), .1); }
+
+/* Admin: Mitglieder und Gruppe löschen */
+.admin-members { list-style: none; margin: 0; padding: 0; display: grid; }
+.admin-members > li { border-top: 1px solid var(--line); }
+.member-row { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 0; border: 0; background: none; color: var(--ink); text-align: left; }
+.member-row > span:not(.avatar) { flex: 1; display: grid; }
+.member-row small { color: var(--muted); font-size: 13px; }
+.member-row > svg { color: var(--muted); transition: transform .2s; }
+.admin-members > li.open .member-row > svg { transform: rotate(180deg); }
+.member-body { display: grid; gap: 10px; padding: 0 0 14px; }
+.rename-row { display: flex; align-items: end; gap: 8px; }
+.rename-row label { flex: 1; }
+.member-reviews { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.member-reviews li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: var(--surface); }
+.member-reviews li > span:first-child { flex: 1; min-width: 0; display: grid; }
+.member-reviews small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.member-reviews .icon-btn { width: 36px; height: 36px; }
+.confirm-inline { display: flex; gap: 6px; flex: none; }
+.danger-card .card-head h2 { color: var(--cranberry); }
+.btn.danger-outline { color: var(--cranberry); border-color: rgba(200, 60, 70, .45); }
+.danger-confirm { display: grid; gap: 10px; }
+.danger-confirm p { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.danger-confirm p svg { color: var(--cranberry); }
+.danger-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
 /* Design „Frost“ (ersetzt Zuckerstange, Nov. 2026): eisiges Hellblau, weiße Eisplatten-Karten, Marineblau, breite geometrische Überschriften, Schneekristall */
 :root[data-ui][data-theme="frost"] { --display: 'Unbounded Variable', system-ui, sans-serif; --radius: 18px; --radius-sm: 14px; --btn-radius: 12px; --line: rgba(14, 34, 54, .14); }

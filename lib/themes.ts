@@ -1,6 +1,6 @@
 /** Farbwelten mit gleichem Aufbau. Die CSS-Variablen steuern die Oberfläche, `scene` den Three.js-Hintergrund. */
 import type { SceneBg, SceneParticles } from '../components/BackgroundScene';
-import type { CupVariant } from '../components/WinterCup';
+import type { CupVariant } from './paper';
 type Vec3 = [number, number, number];
 export type Theme = {
   id: string; name: string; hint: string; light?: boolean; cup: CupVariant;

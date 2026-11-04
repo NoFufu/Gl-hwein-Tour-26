@@ -13,6 +13,7 @@ import NoseSheet from '../components/NoseSheet';
 import StyleSheet from '../components/StyleSheet';
 import Intro from '../components/Intro';
 import Onboarding from '../components/Onboarding';
+import PaperArch from '../components/PaperArch';
 import { exportBackup, exportCsv } from '../lib/export';
 import { applyTheme, CUP_KEY, DEFAULT_THEME, isCupChoice, THEME_KEY, themeById, type CupChoice } from '../lib/themes';
 import Avatar from '../components/ui/Avatar';
@@ -25,7 +26,6 @@ import type { RouteRequest } from '../components/TourMap';
 import { average, createStore, explainError, loadAdminKey, saveAdminKey, ADMIN_PROFILE, type GroupEvent, type GroupMeta, inviteLink, liveConfigured, loadGroupCode, loadProfile, newGroupCode, normalizeCode, reviewId, saveGroupCode, saveProfile, type Profile, type Review, type ReviewStore, type SyncStatus } from '../lib/reviews';
 
 const TourMap = dynamic(() => import('../components/TourMap'), { ssr: false, loading: () => <div className="map-skeleton">Karte wird geladen …</div> });
-const WinterCup = dynamic(() => import('../components/WinterCup'), { ssr: false });
 const BackgroundScene = dynamic(() => import('../components/BackgroundScene'), { ssr: false });
 
 type View = 'tour' | 'ranking' | 'photos' | 'group' | 'admin';
@@ -36,6 +36,11 @@ const nav: { id: View; label: string; icon: typeof Map }[] = [
   { id: 'group', label: 'Gruppe', icon: Users },
 ];
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+/** „Du, Anna und 3 weitere“ */
+function crewLine(names: string[]) {
+  if (names.length <= 3) return names.length > 1 ? `${names.slice(0, -1).join(', ')} und ${names.at(-1)}` : names[0];
+  return `${names.slice(0, 2).join(', ')} und ${names.length - 2} weitere`;
+}
 const standById = (id: string) => stands.find(s => s.id === id) || stands[0];
 const STANDS_CACHE = (g: string) => `glueh26-stands:${g}`;
 const SEEN_KEY = 'glueh26-seen-events';
@@ -97,6 +102,8 @@ export default function Home() {
   const [nameDraft, setNameDraft] = useState('');
   const [lightbox, setLightbox] = useState<{ src: string; label: string } | null>(null);
   const [toast, setToast] = useState('');
+  const [renaming, setRenaming] = useState(false);
+  const [adminOpen, setAdminOpen] = useState(false);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const photoDialog = useRef<HTMLDialogElement>(null), nameDialog = useRef<HTMLDialogElement>(null);
 
@@ -198,6 +205,17 @@ export default function Home() {
     if (online && !wasOnline.current) { setFlashLive(true); const t = setTimeout(() => setFlashLive(false), 2600); wasOnline.current = true; return () => clearTimeout(t); }
     if (!online) wasOnline.current = false;
   }, [store, sync.online]);
+
+  // Hat der Admin deinen Namen korrigiert, übernimmt dieses Handy ihn, damit neue Bewertungen nicht wieder den alten tragen.
+  useEffect(() => {
+    if (store?.mode !== 'live' || sync.pending || !profile.name) return;
+    const mine = reviews.filter(r => r.authorId === profile.id);
+    const fixed = mine[0]?.author;
+    if (fixed && fixed !== profile.name && mine.every(r => r.author === fixed)) {
+      const p = { ...profile, name: fixed };
+      setProfile(p); profileRef.current = p; saveProfile(p);
+    }
+  }, [reviews, store, sync.pending, profile]);
 
   const byStand = useMemo(() => {
     const m: Record<string, Review[]> = {};
@@ -312,9 +330,19 @@ export default function Home() {
     e.preventDefault();
     const name = nameDraft.trim();
     if (!name) return;
+    const changed = name !== profile.name;
     const p = { ...profile, name };
     setProfile(p); profileRef.current = p; saveProfile(p);
     const next = askName; setAskName(null);
+    // Umbenennen: auch die schon abgegebenen Bewertungen bekommen den neuen Namen.
+    if (renaming && changed && store?.mode === 'live' && profile.name) {
+      const before = profile;
+      store.renameAuthor(p.id, name).then(() => { refresh(store); notify(`Du heißt jetzt ${name}.`); }, () => {
+        setProfile(before); profileRef.current = before; saveProfile(before);
+        notify('Umbenennen geht nur mit Verbindung. Versuch es gleich nochmal.');
+      });
+    }
+    setRenaming(false);
     if (firstName) { setFirstName(false); setGuide(true); }
     next?.();
   }
@@ -379,7 +407,7 @@ export default function Home() {
               {isNose && <button type="button" className="nose-btn" onClick={() => setNoseOpen(true)}><span aria-hidden="true">👃</span> Nasenmeister-Ansage</button>}
             </div>
             <div className="hero-cup">
-              <WinterCup variant={cup === 'auto' ? themeById(theme).cup : cup} light={!!themeById(theme).light} />
+              <PaperArch theme={theme} cup={cup === 'auto' ? themeById(theme).cup : cup} />
               <button type="button" className="style-chip" onClick={() => setStyleOpen(true)}><Palette size={15} aria-hidden="true" /> Design & Tasse</button>
             </div>
           </section>
@@ -485,34 +513,30 @@ export default function Home() {
         </>}
 
         {!gate && view === 'group' && <>
-          <PageHead label="Eure Runde" title="Gruppe" sub={people.length ? `${plural(people.length, 'Person hat', 'Leute haben')} schon bewertet.` : 'Noch hat niemand bewertet.'} />
-          <section className="card me">
-            <Avatar name={profile.name || '?'} size={48} />
-            <div><small>Du bewertest als</small><strong>{profile.name || 'noch ohne Namen'}</strong></div>
-            <button type="button" className="btn ghost small" onClick={() => { setNameDraft(profile.name); setAskName(() => () => {}); }}>Ändern</button>
-          </section>
-          <section className={`card sync-card ${live && sync.online && !sync.pending ? 'is-live' : ''}`}>
-            {live && sync.online ? <Wifi size={20} /> : <WifiOff size={20} />}
+          <PageHead label="Eure Runde" title="Gruppe" sub={people.length ? `${plural(people.length, 'Person ist', 'Leute sind')} dabei.` : 'Noch hat niemand bewertet.'} />
+          {(!live || syncProblem) && <section className="card sync-card">
+            <WifiOff size={20} />
             <div>
-              <strong>{!live ? 'Nur auf diesem Gerät' : sync.pending ? plural(sync.pending, 'Änderung wartet', 'Änderungen warten') + ' auf Upload' : sync.online ? 'Live verbunden' : 'Gerade offline'}</strong>
+              <strong>{!live ? 'Nur auf diesem Gerät' : sync.pending ? plural(sync.pending, 'Änderung wartet', 'Änderungen warten') + ' auf Upload' : 'Gerade offline'}</strong>
               <p>{!live ? 'Die gemeinsame Datenbank ist noch nicht eingerichtet. Bis dahin siehst du nur deine eigenen Bewertungen.'
                 : sync.pending ? 'Alles ist auf deinem Handy gespeichert und wird automatisch nachgeschickt.'
-                : sync.online ? 'Neue Bewertungen der Gruppe erscheinen automatisch.' : 'Du siehst den letzten Stand. Neue Bewertungen werden nachgeschickt.'}</p>
+                : 'Du siehst den letzten Stand. Neue Bewertungen werden nachgeschickt.'}</p>
               {live && sync.error && <p className="sync-error">Grund: {sync.error}</p>}
               {live && sync.pending > 0 && <button type="button" className="btn ghost small" onClick={() => store?.flush()}>Jetzt erneut senden</button>}
             </div>
-          </section>
-          {live && group && <section className="card code-card">
-            <div><small>Gruppencode</small><strong className="tabular">{group}</strong></div>
           </section>}
-          {live && group && (isAdmin
-            ? <section className="card admin-entry"><Shield size={20} /><div><strong>Du bist Admin</strong><p>Stände bearbeiten und Events an alle schicken.</p></div><button type="button" className="btn primary small" onClick={() => changeView('admin')}>Öffnen</button></section>
-            : <form className="card admin-entry" onSubmit={enterAdmin}><KeyRound size={20} /><div><strong>Admin-Code</strong><input value={adminDraft} onChange={e => setAdminDraft(e.target.value.toUpperCase())} placeholder={hasAdmin === false ? 'Code festlegen' : 'Code'} inputMode="numeric" autoComplete="off" autoCapitalize="characters" spellCheck={false} aria-label="Admin-Code" /></div><button type="submit" className="btn ghost small" disabled={adminDraft.trim().length < 4}>Freischalten</button></form>)}
+          {people.length > 0 && <details className="card crew">
+            <summary>
+              <span className="crew-faces" aria-hidden="true">{people.slice(0, 5).map(p => <Avatar key={p.id} name={p.name} size={30} />)}</span>
+              <span className="crew-names">{crewLine(people.map(p => p.id === profile.id ? 'Du' : p.name))}</span>
+              <ChevronDown size={18} className="crew-chevron" />
+            </summary>
+            <ul className="people">
+              {people.map(p => <li key={p.id}><Avatar name={p.name} size={34} /><span className="person"><strong>{p.name}{p.id === meta.nasenmeisterId && <NoseBadge compact />}{p.id === profile.id && <span className="you">Du</span>}</strong><small>{plural(p.count, 'Stand', 'Stände')} bewertet · im Schnitt {formatScore(p.avg)}</small></span><span className="progress"><i style={{ width: `${(p.count / stands.length) * 100}%` }} /></span></li>)}
+            </ul>
+          </details>}
           <button type="button" className="btn primary wide" onClick={share}><Copy size={17} /> Freunde einladen</button>
-          {live && <p className="fine">Der Einladungslink enthält euren Gruppencode. Wer ihn hat, kann mitbewerten.</p>}
-          {people.length > 0 && <ul className="people">
-            {people.map(p => <li key={p.id}><Avatar name={p.name} size={38} /><span className="person"><strong>{p.name}{p.id === meta.nasenmeisterId && <NoseBadge compact />}{p.id === profile.id && <span className="you">Du</span>}</strong><small>{plural(p.count, 'Stand', 'Stände')} bewertet · im Schnitt {formatScore(p.avg)}</small></span><span className="progress"><i style={{ width: `${(p.count / stands.length) * 100}%` }} /></span></li>)}
-          </ul>}
+          {live && group && <p className="fine">Gruppencode <span className="code-inline tabular">{group}</span> · Wer den Link hat, kann mitbewerten.</p>}
           <button type="button" className="btn ghost wide" onClick={() => setStyleOpen(true)}><Palette size={17} /> Design & Tasse ändern</button>
           <button type="button" className="btn ghost wide" onClick={() => setGuide(true)}><BookOpen size={17} /> Anleitung & Handy-Check</button>
           <section className="card export-card">
@@ -523,7 +547,13 @@ export default function Home() {
               {isAdmin && <button type="button" className="btn ghost wide" onClick={() => exportBackup(group, stands, reviews, meta)}><Download size={17} /> Komplett-Backup (JSON)</button>}
             </div>
           </section>
-          <button type="button" className="link-btn" onClick={() => setIntro(true)}>Start-Animation nochmal ansehen</button>
+          <div className="group-links">
+            <button type="button" className="link-btn" onClick={() => { setNameDraft(profile.name); setRenaming(true); setAskName(() => () => {}); }}>Du bist als {profile.name || 'Gast'} dabei · Namen ändern</button>
+            <button type="button" className="link-btn" onClick={() => setIntro(true)}>Start-Animation nochmal ansehen</button>
+            {live && group && !isAdmin && (adminOpen
+              ? <form className="admin-login" onSubmit={enterAdmin}><input value={adminDraft} onChange={e => setAdminDraft(e.target.value.toUpperCase())} placeholder={hasAdmin === false ? 'Code festlegen' : 'Admin-Code'} inputMode="numeric" autoComplete="off" autoCapitalize="characters" spellCheck={false} aria-label="Admin-Code" autoFocus /><button type="submit" className="btn ghost small" disabled={adminDraft.trim().length < 4}>Freischalten</button></form>
+              : <button type="button" className="link-btn" onClick={() => setAdminOpen(true)}><KeyRound size={13} /> Admin-Login</button>)}
+          </div>
           <details className="sources">
             <summary>Standliste 2025 & Quellen</summary>
             <p>Belegte Auswahl, keine vollständige Beschickerliste. Preise und genaue Standpositionen sind nicht gesichert. Für 2026 müssen die Stopps neu geprüft werden.</p>
@@ -534,8 +564,8 @@ export default function Home() {
 
         {!gate && view === 'admin' && isAdmin && store && <>
           <PageHead label="Nur für Admins" title="Admin" sub="Events erscheinen sofort bei allen in der Gruppe. Änderungen an Ständen sehen alle beim nächsten Laden." />
-          <AdminView store={store} stands={stands} adminKey={adminKey} adminName={profile.name} currentId={now} events={events} people={people.some(x => x.id === profile.id) ? people : [{ id: profile.id, name: profile.name }, ...people]} meta={meta}
-            onStandsSaved={() => loadStands(store, group)} notify={notify} />
+          <AdminView store={store} stands={stands} adminKey={adminKey} adminName={profile.name} currentId={now} events={events} people={people.some(x => x.id === profile.id) ? people : [{ id: profile.id, name: profile.name }, ...people]} meta={meta} reviews={reviews}
+            onStandsSaved={() => loadStands(store, group)} onReviewsChanged={() => { refresh(store); store.getMeta().then(setMeta, () => {}); store.listEvents().then(setEvents, () => {}); }} notify={notify} />
           <button type="button" className="link-btn" onClick={leaveAdmin}>Admin auf diesem Handy abmelden</button>
         </>}
       </main>
@@ -573,10 +603,12 @@ export default function Home() {
       {guide && !askName && !intro && <Guide theme={theme} onTheme={chooseTheme} onClose={closeGuide} />}
       {rateStand && <RatingSheet key={rateStand.id} stand={rateStand} rating={ownRating(rateStand)} hint={hint} current={rateStand.id === now ? undefined : nowStand} onSwitch={() => { setRateStand(null); startRating(nowStand); }} onClose={() => setRateStand(null)} onSave={saveRating} />}
 
-      <dialog ref={nameDialog} className="sheet name-dialog" aria-labelledby="name-title" onCancel={e => { if (firstName) e.preventDefault(); else setAskName(null); }}>
+      <dialog ref={nameDialog} className="sheet name-dialog" aria-labelledby="name-title" onCancel={e => { if (firstName) e.preventDefault(); else { setAskName(null); setRenaming(false); } }}>
         <form onSubmit={saveName}>
-          <div className="sheet-top"><h2 id="name-title">{firstName ? 'Hi! Wie heißt du?' : 'Wie heißt du?'}</h2>{!firstName && <button type="button" className="icon-btn" aria-label="Schließen" onClick={() => setAskName(null)}><X size={20} /></button>}</div>
-          <p className="muted">So sieht die Gruppe, wer bewertet hat. Du kannst den Namen später unter „Gruppe“ ändern.</p>
+          <div className="sheet-top"><h2 id="name-title">{firstName ? 'Hi! Wie heißt du?' : renaming ? 'Namen ändern' : 'Wie heißt du?'}</h2>{!firstName && <button type="button" className="icon-btn" aria-label="Schließen" onClick={() => { setAskName(null); setRenaming(false); }}><X size={20} /></button>}</div>
+          {renaming && profile.name
+            ? <p className="muted rename-warn">Die Gruppe kennt dich als <strong>{profile.name}</strong>. Bitte nur ändern, wenn der Name falsch ist, damit alle wissen, wer was bewertet hat. Deine bisherigen Bewertungen bekommen den neuen Namen.</p>
+            : <p className="muted">So sieht die Gruppe, wer bewertet hat. Wähl ihn mit Bedacht, ändern geht später nur über „Gruppe“.</p>}
           <label htmlFor="name-input">Dein Name</label>
           <input id="name-input" value={nameDraft} onChange={e => setNameDraft(e.target.value)} maxLength={30} required autoComplete="given-name" />
           <button className="btn primary wide" type="submit"><Check size={18} /> Speichern</button>

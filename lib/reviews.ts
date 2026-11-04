@@ -52,6 +52,12 @@ export interface ReviewStore {
   getMeta(): Promise<GroupMeta>;
   setNasenmeister(id: string | null, name: string | null): Promise<void>;
   onMeta(listener: () => void): () => void;
+  /** Namen in allen Bewertungen dieser Person ersetzen (eigener Name oder Korrektur durch Admin). */
+  renameAuthor(authorId: string, name: string): Promise<void>;
+  /** Admin: Bewertungen anderer löschen. Lässt die Daten auf diesem Gerät in Ruhe. */
+  removeReviews(ids: string[]): Promise<void>;
+  /** Admin: alle Bewertungen, Events und den Nasenmeister der Gruppe löschen. Stände und Admin bleiben. */
+  resetGroup(): Promise<void>;
 }
 
 const GROUP_KEY = 'glueh26-group';
@@ -152,6 +158,9 @@ function localStore(profile: () => Profile): ReviewStore {
     getMeta: async () => ({ nasenmeisterId: null, nasenmeisterName: null }),
     setNasenmeister: async () => {},
     onMeta: () => () => {},
+    renameAuthor: async () => {},
+    removeReviews: async () => { throw Error('Löschen gibt es nur mit gemeinsamer Datenbank.'); },
+    resetGroup: async () => { throw Error('Löschen gibt es nur mit gemeinsamer Datenbank.'); },
   };
 }
 const toReview = (standId: string, r: Rating, p: Profile): Review => ({
@@ -398,6 +407,32 @@ async function liveStore(url: string, key: string, group: string, profile: () =>
       metaListeners.forEach(l => l());
     },
     onMeta(listener) { metaListeners.add(listener); return () => metaListeners.delete(listener); },
+    async renameAuthor(authorId, name) {
+      const { error } = await db.from('reviews').update({ author: name }).eq('group_code', group).eq('author_id', authorId).abortSignal(timeout(12000));
+      if (error) throw Error(explainError(error));
+      outbox = outbox.map(p => p.review.authorId === authorId ? { ...p, review: { ...p.review, author: name } } : p);
+      persistOutbox();
+      announce();
+    },
+    async removeReviews(ids) {
+      if (!ids.length) return;
+      // select() zeigt, ob Supabase wirklich gelöscht hat (ohne Recht kommt einfach nichts zurück).
+      const { data, error } = await db.from('reviews').delete().eq('group_code', group).in('id', ids).select('id').abortSignal(timeout(15000));
+      if (error) throw Error(explainError(error));
+      if (!data?.length) throw Error('Supabase hat nichts gelöscht. Bist du noch als Admin angemeldet?');
+      announce();
+      listeners.forEach(l => l());
+    },
+    async resetGroup() {
+      for (const table of ['reviews', 'events', 'group_meta'] as const) {
+        const { error } = await db.from(table).delete().eq('group_code', group).abortSignal(timeout(15000));
+        if (error) throw Error(explainError(error));
+      }
+      outbox = []; persistOutbox(); setStatus({ error: '' });
+      kvSet(CACHE, []).catch(() => {});
+      announce(); send('meta', {});
+      listeners.forEach(l => l()); metaListeners.forEach(l => l());
+    },
   };
 }
 

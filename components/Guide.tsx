@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { Check, Hand, LocateFixed, MapPin, Palette, Share, Smartphone, X } from 'lucide-react';
-import { asset } from '../lib/asset';
 import { cups, themeById, themes, type CupChoice } from '../lib/themes';
+import { mugIcon, type CupVariant } from '../lib/paper';
 
 type InstallPrompt = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 let deferredInstall: InstallPrompt | null = null;
@@ -25,7 +25,7 @@ export function ThemePicker({ value, onChange }: { value: string; onChange: (id:
 /** Tasse frei wählen. „Automatisch" folgt dem Design, alles andere bleibt fest. */
 export function CupPicker({ value, theme, onChange }: { value: CupChoice; theme: string; onChange: (c: CupChoice) => void }) {
   const auto = themeById(theme).cup;
-  const options: { id: CupChoice; name: string; img: string }[] = [
+  const options: { id: CupChoice; name: string; img: CupVariant }[] = [
     { id: 'auto', name: 'Automatisch', img: auto },
     ...cups.map(c => ({ id: c.id, name: c.name, img: c.id })),
   ];
@@ -33,7 +33,7 @@ export function CupPicker({ value, theme, onChange }: { value: CupChoice; theme:
     <div className="cup-picker" role="radiogroup" aria-label="Tasse">
       {options.map(o => (
         <button key={o.id} type="button" role="radio" aria-checked={o.id === value} className={`${o.id === value ? 'active' : ''}${o.id === 'auto' ? ' is-auto' : ''}`} onClick={() => onChange(o.id)}>
-          <img src={asset(`/tassen/${o.img}.png`)} alt="" width={64} height={64} loading="lazy" decoding="async" />
+          <span className="cup-icon" dangerouslySetInnerHTML={{ __html: mugIcon(o.img, `cup-${o.id}`) }} />
           <small>{o.name}</small>
           {o.id === value && <Check size={13} className="theme-check" />}
         </button>

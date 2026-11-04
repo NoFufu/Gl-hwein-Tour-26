@@ -1,9 +1,10 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { ArrowDown, ArrowUp, Beer, Clock, Copy, ImagePlus, LoaderCircle, LocateFixed, Megaphone, Navigation, Pencil, Plus, RotateCcw, Trash2, Trophy, X } from 'lucide-react';
-import { defaultStands, fallbackImage, stopNumber, type Stand } from '../lib/data';
+import { ArrowDown, ArrowUp, Beer, ChevronDown, Clock, Copy, ImagePlus, LoaderCircle, LocateFixed, Megaphone, Navigation, Pencil, Plus, RotateCcw, Trash2, Trophy, TriangleAlert, X } from 'lucide-react';
+import { defaultStands, fallbackImage, formatScore, stopNumber, type Stand } from '../lib/data';
 import { preparePhoto } from '../lib/storage';
-import type { EventKind, GroupEvent, GroupMeta, ReviewStore } from '../lib/reviews';
+import { average, type EventKind, type GroupEvent, type GroupMeta, type Review, type ReviewStore } from '../lib/reviews';
+import Avatar from './ui/Avatar';
 import { eventIcons } from './EventBanner';
 
 const kinds: { id: EventKind; label: string; icon: typeof Clock }[] = [
@@ -15,10 +16,10 @@ const kinds: { id: EventKind; label: string; icon: typeof Clock }[] = [
 ];
 const timeFmt = new Intl.DateTimeFormat('de-DE', { hour: '2-digit', minute: '2-digit' });
 
-export default function AdminView({ store, stands, adminKey, adminName, currentId, events, people, meta, onStandsSaved, notify }: {
+export default function AdminView({ store, stands, adminKey, adminName, currentId, events, people, meta, reviews, onStandsSaved, onReviewsChanged, notify }: {
   store: ReviewStore; stands: Stand[]; adminKey: string; adminName: string; currentId: string; events: GroupEvent[];
-  people: { id: string; name: string }[]; meta: GroupMeta;
-  onStandsSaved: () => void; notify: (msg: string) => void;
+  people: { id: string; name: string }[]; meta: GroupMeta; reviews: Review[];
+  onStandsSaved: () => void; onReviewsChanged: () => void; notify: (msg: string) => void;
 }) {
   const [kind, setKind] = useState<EventKind>('treffpunkt');
   const [standId, setStandId] = useState(currentId);
@@ -134,6 +135,9 @@ export default function AdminView({ store, stands, adminKey, adminName, currentI
         </div>
       </section>
 
+      <MembersCard store={store} stands={stands} reviews={reviews} meta={meta} notify={notify} onChanged={onReviewsChanged} />
+      <DangerCard store={store} reviews={reviews} notify={notify} onChanged={onReviewsChanged} />
+
       {editing && <StandEditor stand={editing} isNew={!stands.some(s => s.id === editing.id)} store={store} notify={notify}
         onClose={() => setEditing(null)}
         onSave={async next => { const exists = stands.some(s => s.id === next.id); const ok = await save(exists ? stands.map(s => s.id === next.id ? next : s) : [...stands, next], 'Stand gespeichert.'); if (ok) setEditing(null); }}
@@ -207,5 +211,100 @@ function StandEditor({ stand, isNew, store, notify, onSave, onDelete, onClose }:
           : <button type="button" className="link-btn" onClick={() => setConfirmDelete(true)}><Trash2 size={14} /> Stand löschen</button>)}
       </form>
     </dialog>
+  );
+}
+
+/** Wer hat bewertet: Namen korrigieren, einzelne oder alle Bewertungen einer Person löschen. */
+function MembersCard({ store, stands, reviews, meta, notify, onChanged }: {
+  store: ReviewStore; stands: Stand[]; reviews: Review[]; meta: GroupMeta; notify: (m: string) => void; onChanged: () => void;
+}) {
+  const [open, setOpen] = useState('');
+  const [name, setName] = useState('');
+  const [confirm, setConfirm] = useState(''); // Review-ID oder "all:<authorId>"
+  const [busy, setBusy] = useState(false);
+  const members = Object.values(reviews.reduce<Record<string, { id: string; name: string; list: Review[] }>>((m, r) => {
+    (m[r.authorId] ||= { id: r.authorId, name: r.author, list: [] }).list.push(r); return m;
+  }, {})).sort((a, b) => a.name.localeCompare(b.name, 'de'));
+  const standName = (id: string) => stands.find(s => s.id === id)?.name ?? 'Gelöschter Stand';
+
+  async function run(task: () => Promise<void>, msg: string) {
+    setBusy(true);
+    try { await task(); setConfirm(''); onChanged(); notify(msg); }
+    catch (err) { notify(err instanceof Error ? err.message : 'Hat nicht geklappt.'); }
+    finally { setBusy(false); }
+  }
+  function toggle(id: string, current: string) { setConfirm(''); setOpen(o => o === id ? '' : id); setName(current); }
+
+  return (
+    <section className="card admin-card">
+      <div className="card-head"><h2>Mitglieder</h2><span className="pill">{members.length} mit Bewertung</span></div>
+      <div className="admin-body">
+        {!members.length && <p className="muted">Noch hat niemand bewertet.</p>}
+        {members.length > 0 && <p className="muted">Namen korrigieren oder Bewertungen löschen. Die Gruppe sieht Änderungen sofort.</p>}
+        <ul className="admin-members">
+          {members.map(m => (
+            <li key={m.id} className={open === m.id ? 'open' : ''}>
+              <button type="button" className="member-row" aria-expanded={open === m.id} onClick={() => toggle(m.id, m.name)}>
+                <Avatar name={m.name} size={34} />
+                <span><strong>{m.name}{m.id === meta.nasenmeisterId && <span aria-label="Nasenmeister"> 👃</span>}</strong><small>{m.list.length} {m.list.length === 1 ? 'Bewertung' : 'Bewertungen'}</small></span>
+                <ChevronDown size={18} />
+              </button>
+              {open === m.id && <div className="member-body">
+                <form className="rename-row" onSubmit={e => { e.preventDefault(); const n = name.trim(); if (n && n !== m.name) run(() => store.renameAuthor(m.id, n), `Name geändert in ${n}.`); }}>
+                  <label>Name<input autoComplete="off" value={name} onChange={e => setName(e.target.value)} maxLength={30} /></label>
+                  <button type="submit" className="btn ghost small" disabled={busy || !name.trim() || name.trim() === m.name}>Korrigieren</button>
+                </form>
+                <ul className="member-reviews">
+                  {m.list.map(r => (
+                    <li key={r.id}>
+                      <span><strong>{standName(r.standId)}</strong><small>{formatScore(average(r.values))}{r.comment ? ` · „${r.comment.slice(0, 40)}${r.comment.length > 40 ? '…' : ''}“` : ''}{r.photos.length ? ` · ${r.photos.length} Foto${r.photos.length > 1 ? 's' : ''}` : ''}</small></span>
+                      {confirm === r.id
+                        ? <span className="confirm-inline"><button type="button" className="btn ghost small" onClick={() => setConfirm('')}>Nein</button><button type="button" className="btn danger small" disabled={busy} onClick={() => run(() => store.removeReviews([r.id]), 'Bewertung gelöscht.')}>Löschen</button></span>
+                        : <button type="button" className="icon-btn" aria-label={`Bewertung von ${m.name} für ${standName(r.standId)} löschen`} onClick={() => setConfirm(r.id)}><Trash2 size={16} /></button>}
+                    </li>
+                  ))}
+                </ul>
+                {confirm === `all:${m.id}`
+                  ? <div className="review-own"><span>Alle {m.list.length} Bewertungen von {m.name} löschen?</span><button type="button" className="btn ghost small" onClick={() => setConfirm('')}>Behalten</button><button type="button" className="btn danger small" disabled={busy} onClick={() => run(() => store.removeReviews(m.list.map(r => r.id)), `Bewertungen von ${m.name} gelöscht.`)}>Löschen</button></div>
+                  : m.list.length > 1 && <button type="button" className="link-btn" onClick={() => setConfirm(`all:${m.id}`)}><Trash2 size={14} /> Alle Bewertungen von {m.name} löschen</button>}
+              </div>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+const RESET_WORD = 'LÖSCHEN';
+/** Gruppe leeren. Braucht das Tippen eines Worts, damit es nicht aus Versehen passiert. */
+function DangerCard({ store, reviews, notify, onChanged }: { store: ReviewStore; reviews: Review[]; notify: (m: string) => void; onChanged: () => void }) {
+  const [step, setStep] = useState(false);
+  const [word, setWord] = useState('');
+  const [busy, setBusy] = useState(false);
+  const photos = reviews.reduce((n, r) => n + r.photos.length, 0);
+  async function reset() {
+    setBusy(true);
+    try { await store.resetGroup(); setStep(false); setWord(''); onChanged(); notify('Gruppe gelöscht. Alles startet bei null.'); }
+    catch (err) { notify(err instanceof Error ? err.message : 'Löschen hat nicht geklappt.'); }
+    finally { setBusy(false); }
+  }
+  return (
+    <section className="card admin-card danger-card">
+      <div className="card-head"><h2>Gruppe löschen</h2></div>
+      <div className="admin-body">
+        <p className="muted">Löscht alle {reviews.length} Bewertungen{photos ? ` mit ${photos} Fotos` : ''}, alle Events und den Nasenmeister. Die Stände und dein Admin-Zugang bleiben, der Gruppencode auch. Das lässt sich nicht rückgängig machen, lade vorher lieber das Komplett-Backup unter „Gruppe“.</p>
+        {!step
+          ? <button type="button" className="btn ghost wide danger-outline" onClick={() => setStep(true)}><Trash2 size={17} /> Gruppe löschen …</button>
+          : <form className="danger-confirm" onSubmit={e => { e.preventDefault(); if (word.trim().toUpperCase() === RESET_WORD) reset(); }}>
+              <p><TriangleAlert size={16} /> Zum Bestätigen <strong>{RESET_WORD}</strong> eintippen.</p>
+              <input autoComplete="off" autoCapitalize="characters" spellCheck={false} value={word} onChange={e => setWord(e.target.value)} aria-label={`${RESET_WORD} eintippen`} />
+              <div className="danger-actions">
+                <button type="button" className="btn ghost small" onClick={() => { setStep(false); setWord(''); }}>Abbrechen</button>
+                <button type="submit" className="btn danger small" disabled={busy || word.trim().toUpperCase() !== RESET_WORD}>{busy ? <LoaderCircle className="spin" size={15} /> : null} Endgültig löschen</button>
+              </div>
+            </form>}
+      </div>
+    </section>
   );
 }
