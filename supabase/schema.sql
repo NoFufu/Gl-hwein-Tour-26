@@ -151,3 +151,10 @@ grant execute on function public.request_member(), public.is_nasenmeister() to a
 drop policy if exists "events nase" on public.events;
 create policy "events nase" on public.events for insert
   with check (group_code = public.request_group() and kind = 'nase' and public.is_nasenmeister());
+
+-- ───────────── Löschen: eigene Bewertungen ja, fremde nur als Admin ─────────────
+-- Vorher durfte jedes Gruppenmitglied jede Bewertung löschen. Jetzt nur noch die eigene (Geräte-ID im Header
+-- "x-member-id") oder als Admin. Gruppe zurücksetzen im Admin-Tab braucht genau diese Regel plus die Admin-Regeln oben.
+drop policy if exists "gruppe löschen" on public.reviews;
+create policy "gruppe löschen" on public.reviews for delete
+  using (group_code = public.request_group() and (author_id = public.request_member() or public.is_admin()));

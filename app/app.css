@@ -881,3 +881,45 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 .style-sheet .cup-picker, .onboard .cup-picker { padding: 0; }
 .style-sheet .btn.wide { margin-top: 18px; }
 .onboard-sub { margin: 18px 0 8px; font-size: 18px; text-align: left; width: 100%; }
+
+/* Gruppe aufgeräumt (Nov. 2026): Mitglieder als zugeklappte Zeile, Code klein im Fließtext, Admin nur noch als Link */
+.crew { padding: 0; }
+.crew summary { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 16px; cursor: pointer; list-style: none; }
+.crew summary::-webkit-details-marker { display: none; }
+.crew-faces { display: flex; flex: none; }
+.crew-faces .avatar { box-shadow: 0 0 0 2px var(--bg); }
+.crew-faces .avatar + .avatar { margin-left: -9px; }
+.crew-names { flex: 1; min-width: 0; font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.crew-chevron { flex: none; color: var(--muted); transition: transform .2s; }
+.crew[open] .crew-chevron { transform: rotate(180deg); }
+.crew .people { gap: 0; padding: 0 16px 8px; }
+:root .crew .people li, :root[data-ui] .crew .people li { padding: 10px 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; box-shadow: none; }
+.code-inline { color: var(--ink); font-weight: 600; letter-spacing: .04em; }
+.group-links { display: grid; justify-items: start; gap: 2px; }
+.admin-login { display: flex; gap: 8px; align-items: center; width: 100%; max-width: 320px; }
+.admin-login input { flex: 1; min-width: 0; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 15px; }
+.rename-warn { padding: 10px 12px; border-radius: 12px; background: rgba(var(--accent-rgb), .1); }
+
+/* Admin: Mitglieder und Gruppe löschen */
+.admin-members { list-style: none; margin: 0; padding: 0; display: grid; }
+.admin-members > li { border-top: 1px solid var(--line); }
+.member-row { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 0; border: 0; background: none; color: var(--ink); text-align: left; }
+.member-row > span:not(.avatar) { flex: 1; display: grid; }
+.member-row small { color: var(--muted); font-size: 13px; }
+.member-row > svg { color: var(--muted); transition: transform .2s; }
+.admin-members > li.open .member-row > svg { transform: rotate(180deg); }
+.member-body { display: grid; gap: 10px; padding: 0 0 14px; }
+.rename-row { display: flex; align-items: end; gap: 8px; }
+.rename-row label { flex: 1; }
+.member-reviews { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.member-reviews li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; background: var(--surface); }
+.member-reviews li > span:first-child { flex: 1; min-width: 0; display: grid; }
+.member-reviews small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.member-reviews .icon-btn { width: 36px; height: 36px; }
+.confirm-inline { display: flex; gap: 6px; flex: none; }
+.danger-card .card-head h2 { color: var(--cranberry); }
+.btn.danger-outline { color: var(--cranberry); border-color: rgba(200, 60, 70, .45); }
+.danger-confirm { display: grid; gap: 10px; }
+.danger-confirm p { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.danger-confirm p svg { color: var(--cranberry); }
+.danger-actions { display: flex; justify-content: flex-end; gap: 8px; }
