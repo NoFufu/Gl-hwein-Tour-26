@@ -40,6 +40,9 @@ a { color: inherit; }
 h1, h2, h3, p { margin: 0; }
 h1, h2 { font-family: var(--display); font-weight: 600; letter-spacing: -.02em; text-wrap: balance; }
 img { max-width: 100%; display: block; }
+::selection { background: rgba(var(--accent-rgb), .35); color: var(--ink); }
+html { scrollbar-color: rgba(var(--ink-rgb), .25) transparent; }
+input, textarea { caret-color: var(--amber); }
 :focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; border-radius: 8px; }
 .tabular { font-variant-numeric: lining-nums tabular-nums; }
 h1, h2, .stats strong, .podium-score, .score-big > strong, .review-score, .rank-list b { font-variant-numeric: lining-nums; }
@@ -253,6 +256,7 @@ dialog::backdrop { background: rgba(8, 5, 10, .7); backdrop-filter: blur(6px); -
 .score-panel { display: grid; gap: 14px; padding: 16px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); }
 .score-big { display: flex; align-items: center; gap: 14px; }
 .score-big > strong { font: 600 48px/1 var(--display); color: var(--amber); min-width: 2ch; }
+.score-big.is-empty > strong { color: var(--muted); }
 .score-big > div { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
 .criteria-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .criteria-bars li { display: grid; grid-template-columns: 9.5em 1fr 2.2em; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
@@ -858,6 +862,15 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 [data-theme="clean"] .spotlight::before { display: none; }
 [data-theme="clean"] .shiny { letter-spacing: .12em; }
 :root[data-ui][data-theme="clean"] .hero h1 { --hero-fit: 4.4; }
+/* Clean-Feinschliff (Design-Critique Nov. 2026): keine Versal-Labels über Überschriften, Rot nur für die eine Hauptaktion */
+[data-theme="clean"] .page-head > .shiny { display: none; }
+[data-theme="clean"] .hero .shiny, [data-theme="clean"] .sheet-number, [data-theme="clean"] .rating-dialog .eyebrow { text-transform: none; letter-spacing: 0; font-size: 14px; font-weight: 500; color: var(--muted); }
+[data-theme="clean"] .sheet-number { font-variant-numeric: lining-nums tabular-nums; }
+[data-theme="clean"] .how-link { color: var(--ink); }
+[data-theme="clean"] .how-link svg { color: var(--muted); }
+[data-theme="clean"] .dock button.active { color: var(--ink); background: rgba(255, 255, 255, .09); }
+[data-theme="clean"] .dock button.active svg { color: var(--amber); }
+[data-theme="clean"] .score-big:not(.is-empty) > strong { color: var(--ink); }
 
 /* Design & Tasse: Knopf unter der Tasse auf der Startseite, Auswahl als Sheet */
 .style-chip { position: absolute; z-index: 2; left: calc(50% - 23px); bottom: -4px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 0 14px; border-radius: 99px; border: 1px solid var(--line); background: rgba(var(--panel-rgb), .82); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: var(--ink); font-size: 13px; font-weight: 600; white-space: nowrap; box-shadow: 0 4px 14px rgba(0, 0, 0, .12); }
