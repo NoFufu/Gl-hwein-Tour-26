@@ -13,6 +13,7 @@ import NoseSheet from '../components/NoseSheet';
 import StyleSheet from '../components/StyleSheet';
 import Intro from '../components/Intro';
 import Onboarding from '../components/Onboarding';
+import PaperArch from '../components/PaperArch';
 import { exportBackup, exportCsv } from '../lib/export';
 import { applyTheme, CUP_KEY, DEFAULT_THEME, isCupChoice, THEME_KEY, themeById, type CupChoice } from '../lib/themes';
 import Avatar from '../components/ui/Avatar';
@@ -25,7 +26,6 @@ import type { RouteRequest } from '../components/TourMap';
 import { average, createStore, explainError, loadAdminKey, saveAdminKey, ADMIN_PROFILE, type GroupEvent, type GroupMeta, inviteLink, liveConfigured, loadGroupCode, loadProfile, newGroupCode, normalizeCode, reviewId, saveGroupCode, saveProfile, type Profile, type Review, type ReviewStore, type SyncStatus } from '../lib/reviews';
 
 const TourMap = dynamic(() => import('../components/TourMap'), { ssr: false, loading: () => <div className="map-skeleton">Karte wird geladen …</div> });
-const WinterCup = dynamic(() => import('../components/WinterCup'), { ssr: false });
 const BackgroundScene = dynamic(() => import('../components/BackgroundScene'), { ssr: false });
 
 type View = 'tour' | 'ranking' | 'photos' | 'group' | 'admin';
@@ -407,7 +407,7 @@ export default function Home() {
               {isNose && <button type="button" className="nose-btn" onClick={() => setNoseOpen(true)}><span aria-hidden="true">👃</span> Nasenmeister-Ansage</button>}
             </div>
             <div className="hero-cup">
-              <WinterCup variant={cup === 'auto' ? themeById(theme).cup : cup} light={!!themeById(theme).light} />
+              <PaperArch theme={theme} cup={cup === 'auto' ? themeById(theme).cup : cup} />
               <button type="button" className="style-chip" onClick={() => setStyleOpen(true)}><Palette size={15} aria-hidden="true" /> Design & Tasse</button>
             </div>
           </section>
