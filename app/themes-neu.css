@@ -1,73 +1,79 @@
-/* ═════════ Neue Design-Kandidaten statt Zuckerstange (Nov. 2026) ═════════
-   Jedes ändert mehr als Farben: Material der Karten, Form, Schrift und Hintergrund. */
+/* ═════════ Design-Kandidaten statt Zuckerstange, Runde 2 (Nov. 2026) ═════════ */
 
-/* ── Lebkuchen: Teig-Karten mit gestricheltem Zuckerguss, Rosa als Aktion, verspielte Schrift ── */
-:root[data-ui][data-theme="lebkuchen"] { --display: 'Grandstander Variable', system-ui, sans-serif; --radius: 24px; --radius-sm: 20px; --btn-radius: 999px; --icing: rgba(255, 247, 239, .55); }
-[data-ui][data-theme="lebkuchen"] h1, [data-ui][data-theme="lebkuchen"] h2 { font-weight: 800; letter-spacing: -.01em; }
-:root[data-ui][data-theme="lebkuchen"] .hero h1 { --hero-fit: 4.9; font-weight: 900; letter-spacing: -.02em; }
-:root[data-ui][data-theme="lebkuchen"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) {
-  background: #4b2d1d; border: 0; outline: 2px dashed var(--icing); outline-offset: -7px; box-shadow: 0 3px 0 #21130b, 0 14px 30px rgba(0, 0, 0, .35);
-}
-[data-ui][data-theme="lebkuchen"] .stand-card { outline-offset: -6px; }
-[data-ui][data-theme="lebkuchen"] .stand-card.is-now { outline: 2px dashed var(--amber); }
-[data-ui][data-theme="lebkuchen"] .btn.primary, [data-ui][data-theme="lebkuchen"] .dock button.active { box-shadow: inset 0 0 0 3px var(--amber), inset 0 0 0 5px #fff7ef; }
-[data-ui][data-theme="lebkuchen"] .bottom-ui { background: #3d2416; border: 0; outline: 2px dashed var(--icing); outline-offset: -6px; }
-[data-ui][data-theme="lebkuchen"] .bottom-ui .now-bar { background: rgba(255, 158, 187, .1); border-bottom: 2px dashed rgba(255, 247, 239, .25); }
-[data-ui][data-theme="lebkuchen"] .here-tag { background: var(--amber); color: var(--amber-ink); }
-[data-ui][data-theme="lebkuchen"] .progress-track i { height: 10px; }
-[data-ui][data-theme="lebkuchen"] .style-chip { background: #4b2d1d; border: 2px dashed var(--icing); }
+/* ── Lichterkette: fast schwarz, Glühbirnen-Kette als Bordüre, jede Stopp-Nummer eine Birne in ihrer Farbe ── */
+:root[data-ui][data-theme="lichterkette"] { --display: 'Rubik Variable', system-ui, sans-serif; --radius: 20px; --radius-sm: 16px; --btn-radius: 999px; --bulbs: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='34'%3E%3Cpath d='M0 6 Q24 16 48 6 T96 6' fill='none' stroke='%23463f4d' stroke-width='1.6'/%3E%3Ccircle cx='12' cy='18.5' r='10' fill='%23ff5a5f' fill-opacity='.18'/%3E%3Crect x='9.5' y='7.5' width='5' height='4' rx='1' fill='%23595262'/%3E%3Cellipse cx='12' cy='16.5' rx='4' ry='6' fill='%23ff5a5f'/%3E%3Cellipse cx='10.7' cy='14.5' rx='1.2' ry='2' fill='%23fff' fill-opacity='.55'/%3E%3Ccircle cx='36' cy='18.5' r='10' fill='%23ffc845' fill-opacity='.18'/%3E%3Crect x='33.5' y='7.5' width='5' height='4' rx='1' fill='%23595262'/%3E%3Cellipse cx='36' cy='16.5' rx='4' ry='6' fill='%23ffc845'/%3E%3Cellipse cx='34.7' cy='14.5' rx='1.2' ry='2' fill='%23fff' fill-opacity='.55'/%3E%3Ccircle cx='60' cy='18.5' r='10' fill='%233ddc84' fill-opacity='.18'/%3E%3Crect x='57.5' y='7.5' width='5' height='4' rx='1' fill='%23595262'/%3E%3Cellipse cx='60' cy='16.5' rx='4' ry='6' fill='%233ddc84'/%3E%3Cellipse cx='58.7' cy='14.5' rx='1.2' ry='2' fill='%23fff' fill-opacity='.55'/%3E%3Ccircle cx='84' cy='18.5' r='10' fill='%234da3ff' fill-opacity='.18'/%3E%3Crect x='81.5' y='7.5' width='5' height='4' rx='1' fill='%23595262'/%3E%3Cellipse cx='84' cy='16.5' rx='4' ry='6' fill='%234da3ff'/%3E%3Cellipse cx='82.7' cy='14.5' rx='1.2' ry='2' fill='%23fff' fill-opacity='.55'/%3E%3C/svg%3E"); }
+[data-ui][data-theme="lichterkette"] h1, [data-ui][data-theme="lichterkette"] h2 { font-weight: 800; letter-spacing: -.02em; }
+:root[data-ui][data-theme="lichterkette"] .hero h1 { --hero-fit: 4.75; font-weight: 900; }
+[data-ui][data-theme="lichterkette"] .hero { padding-top: 30px; }
+[data-ui][data-theme="lichterkette"] .hero::before { content: ''; position: absolute; left: 0; right: 0; top: -6px; height: 34px; background: var(--bulbs) repeat-x 0 0; z-index: 1; pointer-events: none; }
+:root[data-ui][data-theme="lichterkette"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) { background: #17141b; border: 1px solid rgba(255, 255, 255, .07); box-shadow: 0 12px 30px rgba(0, 0, 0, .5); }
+[data-ui][data-theme="lichterkette"] .stand-num::before { content: ''; width: 9px; height: 12px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: var(--bulb); box-shadow: 0 0 10px 2px var(--bulb); }
+[data-ui][data-theme="lichterkette"] .stand-num { color: var(--bulb); }
+[data-ui][data-theme="lichterkette"] .stand-list > :nth-child(4n+1) { --bulb: #ff5a5f; }
+[data-ui][data-theme="lichterkette"] .stand-list > :nth-child(4n+2) { --bulb: #ffc845; }
+[data-ui][data-theme="lichterkette"] .stand-list > :nth-child(4n+3) { --bulb: #3ddc84; }
+[data-ui][data-theme="lichterkette"] .stand-list > :nth-child(4n+4) { --bulb: #4da3ff; }
+[data-ui][data-theme="lichterkette"] .stand-card.is-now { border-color: rgba(255, 200, 69, .6); }
+[data-ui][data-theme="lichterkette"] .progress-track i { height: 10px; }
+[data-ui][data-theme="lichterkette"] .progress-track i.on { background: #3ddc84; box-shadow: 0 0 8px rgba(61, 220, 132, .6); }
+[data-ui][data-theme="lichterkette"] .bottom-ui { overflow: visible; margin-top: 20px; background: #17141b; border-color: rgba(255, 255, 255, .08); }
+[data-ui][data-theme="lichterkette"] .bottom-ui::before { content: ''; position: absolute; left: 14px; right: 14px; top: -16px; height: 34px; background: var(--bulbs) repeat-x 0 0; pointer-events: none; }
+[data-ui][data-theme="lichterkette"] .bottom-ui .now-bar { border-radius: 24px 24px 0 0; }
+[data-ui][data-theme="lichterkette"] .here-tag { background: var(--amber); color: var(--amber-ink); }
+[data-ui][data-theme="lichterkette"] .btn.primary { box-shadow: 0 0 0 1px rgba(255, 200, 69, .4), 0 6px 22px rgba(255, 200, 69, .28); }
 
-/* ── Norweger: rotes Strickpulli-Feld, Bordüren im Strickmuster, Creme als Aktion, breite kräftige Schrift ── */
-:root[data-ui][data-theme="norweger"] {
-  --display: 'Archivo Variable', system-ui, sans-serif; --text: 'Archivo Variable', system-ui, sans-serif;
-  --radius: 6px; --radius-sm: 4px; --btn-radius: 4px; --line: rgba(255, 243, 227, .22);
-  --knit: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='22' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff3e3' d='M0 0h2v2h-2zM4 0h2v2h-2zM8 0h2v2h-2zM12 0h2v2h-2zM16 0h2v2h-2zM20 0h2v2h-2zM10 4h2v2h-2zM8 6h2v2h-2zM10 6h2v2h-2zM12 6h2v2h-2zM22 6h2v2h-2zM6 8h2v2h-2zM8 8h2v2h-2zM12 8h2v2h-2zM14 8h2v2h-2zM4 10h2v2h-2zM6 10h2v2h-2zM14 10h2v2h-2zM16 10h2v2h-2zM6 12h2v2h-2zM8 12h2v2h-2zM12 12h2v2h-2zM14 12h2v2h-2zM8 14h2v2h-2zM10 14h2v2h-2zM12 14h2v2h-2zM22 14h2v2h-2zM10 16h2v2h-2zM0 20h2v2h-2zM4 20h2v2h-2zM8 20h2v2h-2zM12 20h2v2h-2zM16 20h2v2h-2zM20 20h2v2h-2z'/%3E%3C/svg%3E"); --knit-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='22' shape-rendering='crispEdges'%3E%3Cpath fill='%239e1426' d='M0 0h2v2h-2zM4 0h2v2h-2zM8 0h2v2h-2zM12 0h2v2h-2zM16 0h2v2h-2zM20 0h2v2h-2zM10 4h2v2h-2zM8 6h2v2h-2zM10 6h2v2h-2zM12 6h2v2h-2zM22 6h2v2h-2zM6 8h2v2h-2zM8 8h2v2h-2zM12 8h2v2h-2zM14 8h2v2h-2zM4 10h2v2h-2zM6 10h2v2h-2zM14 10h2v2h-2zM16 10h2v2h-2zM6 12h2v2h-2zM8 12h2v2h-2zM12 12h2v2h-2zM14 12h2v2h-2zM8 14h2v2h-2zM10 14h2v2h-2zM12 14h2v2h-2zM22 14h2v2h-2zM10 16h2v2h-2zM0 20h2v2h-2zM4 20h2v2h-2zM8 20h2v2h-2zM12 20h2v2h-2zM16 20h2v2h-2zM20 20h2v2h-2z'/%3E%3C/svg%3E");
+/* ── Frost: eisiges Hellblau, weiße Eisplatten-Karten, Marineblau, breite geometrische Überschriften, Schneekristall ── */
+:root[data-ui][data-theme="frost"] { --display: 'Unbounded Variable', system-ui, sans-serif; --radius: 18px; --radius-sm: 14px; --btn-radius: 12px; --line: rgba(14, 34, 54, .14); }
+[data-ui][data-theme="frost"] h1, [data-ui][data-theme="frost"] h2 { font-weight: 650; letter-spacing: -.03em; }
+:root[data-ui][data-theme="frost"] .hero h1 { --hero-fit: 5.6; font-weight: 700; letter-spacing: -.04em; }
+[data-ui][data-theme="frost"] .card-head h2, [data-ui][data-theme="frost"] .section-head h2 { font-size: 19px; }
+[data-ui][data-theme="frost"] .page-head h1 { font-size: 32px; }
+[data-ui][data-theme="frost"] .hero::before { content: ''; position: absolute; right: -60px; top: -50px; width: 260px; height: 260px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-50 -50 100 100'%3E%3Cg stroke='%231d4fd8' stroke-width='2.2' stroke-linecap='round' fill='none'%3E%3Cg transform='rotate(0)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(60)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(120)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(180)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(240)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3Cg transform='rotate(300)'%3E%3Cpath d='M0 0V-46M0 -20L-10 -30M0 -20L10 -30M0 -34L-7 -41M0 -34L7 -41'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") no-repeat center / contain; opacity: .12; pointer-events: none; }
+:root[data-ui][data-theme="frost"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) {
+  background: linear-gradient(140deg, #ffffff 0%, rgba(255, 255, 255, .9) 45%, #eef5fb 100%); border: 1px solid #c3d6e6;
+  box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(14, 34, 54, .06), 0 10px 26px rgba(30, 70, 120, .1);
 }
-[data-ui][data-theme="norweger"] h1, [data-ui][data-theme="norweger"] h2 { font-weight: 850; font-stretch: 108%; letter-spacing: -.01em; }
-:root[data-ui][data-theme="norweger"] .hero h1 { --hero-fit: 5.3; font-weight: 900; font-stretch: 125%; letter-spacing: -.015em; line-height: .95; }
-[data-ui][data-theme="norweger"] .hero h1 em { color: #ffd27a; }
-[data-ui][data-theme="norweger"] .hero { padding-bottom: 34px; }
-[data-ui][data-theme="norweger"] .hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 22px; background: var(--knit) repeat-x center; opacity: .9; }
-:root[data-ui][data-theme="norweger"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) {
-  background: #7a0d1d; border: 0; box-shadow: inset 0 0 0 1px rgba(255, 243, 227, .14), 0 10px 24px rgba(60, 0, 8, .35);
-}
-[data-ui][data-theme="norweger"] .progress-card { position: relative; padding-top: 38px; overflow: hidden; }
-[data-ui][data-theme="norweger"] .progress-card::before { content: ''; position: absolute; left: 0; right: 0; top: 8px; height: 22px; background: var(--knit) repeat-x center; opacity: .55; }
-[data-ui][data-theme="norweger"] .stand-card.is-now { box-shadow: inset 0 0 0 2px var(--amber); }
-[data-ui][data-theme="norweger"] .stand-main strong { font-stretch: 110%; font-weight: 750; }
-[data-ui][data-theme="norweger"] .btn.primary { box-shadow: 0 3px 0 rgba(60, 0, 8, .45); font-weight: 800; }
-[data-ui][data-theme="norweger"] .bottom-ui { background: #14402f; border: 0; border-radius: 8px; padding-top: 22px; }
-[data-ui][data-theme="norweger"] .bottom-ui::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 22px; background: #fff3e3 var(--knit-red) repeat-x center; }
-[data-ui][data-theme="norweger"] .bottom-ui .now-bar { background: rgba(255, 243, 227, .06); border-bottom-color: rgba(255, 243, 227, .16); }
-[data-ui][data-theme="norweger"] .dock button { border-radius: 4px; }
-[data-ui][data-theme="norweger"] .here-tag { background: #ffd27a; color: #5a0812; }
-[data-ui][data-theme="norweger"] .progress-track i { border-radius: 2px; height: 10px; }
-[data-ui][data-theme="norweger"] .style-chip { border-radius: 4px; background: #7a0d1d; }
-[data-ui][data-theme="norweger"] .shiny { color: #ffd27a; }
+[data-ui][data-theme="frost"] .stand-card.is-now { border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber), 0 10px 26px rgba(29, 79, 216, .16); }
+[data-ui][data-theme="frost"] .stand-main strong { font-family: var(--display); font-size: 15px; font-weight: 600; letter-spacing: -.02em; }
+[data-ui][data-theme="frost"] .bottom-ui { --ink: #eef5fb; --ink-rgb: 238, 245, 251; --muted: #a9bfd4; --line: rgba(238, 245, 251, .14); background: #0e2236; color: var(--ink); border: 0; border-radius: 20px; box-shadow: 0 14px 34px rgba(14, 34, 54, .3); }
+[data-ui][data-theme="frost"] .bottom-ui .now-bar { background: rgba(238, 245, 251, .05); }
+[data-ui][data-theme="frost"] .bottom-ui .now-info small { color: #8fb4ff; }
+[data-ui][data-theme="frost"] .bottom-ui .btn.primary { background: #eef5fb; color: #0e2236; box-shadow: none; }
+[data-ui][data-theme="frost"] .bottom-ui .dock button.active { background: #1d4fd8; color: #fff; }
+[data-ui][data-theme="frost"] .bottom-ui .now-num { background: #eef5fb; color: #0e2236; }
+[data-ui][data-theme="frost"] .progress-track i { border-radius: 3px; }
+[data-ui][data-theme="frost"] .style-chip { background: #fff; border-color: #c3d6e6; }
 
-/* ── Packpapier: helles Kraftpapier, Karten als Anhänger mit Tintenrand, Rot wie ein Stempel, Serifenschrift ── */
-:root[data-ui][data-theme="packpapier"] { --display: 'Fraunces Variable', Georgia, serif; --radius: 6px; --radius-sm: 4px; --btn-radius: 4px; --line: rgba(35, 23, 14, .35); }
-[data-ui][data-theme="packpapier"] h1, [data-ui][data-theme="packpapier"] h2 { font-weight: 700; letter-spacing: -.02em; font-variation-settings: 'SOFT' 30, 'WONK' 1, 'opsz' 144; }
-:root[data-ui][data-theme="packpapier"] .hero h1 { --hero-fit: 4.5; font-weight: 800; }
-[data-ui][data-theme="packpapier"] .hero h1 em { font-style: italic; font-weight: 600; }
-[data-ui][data-theme="packpapier"] .scene { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cpath d='M0,-9 L2.6,-3.2 L8.6,-2.8 L4,1.2 L5.3,7.3 L0,4.1 L-5.3,7.3 L-4,1.2 L-8.6,-2.8 L-2.6,-3.2Z' fill='%23b3261e' fill-opacity='.22' transform='translate(30 34) rotate(12)'/%3E%3Cpath d='M0,-9 L2.6,-3.2 L8.6,-2.8 L4,1.2 L5.3,7.3 L0,4.1 L-5.3,7.3 L-4,1.2 L-8.6,-2.8 L-2.6,-3.2Z' fill='%23fff8ec' fill-opacity='.35' transform='translate(100 100) rotate(-18) scale(.8)'/%3E%3Ccircle cx='104' cy='30' r='2.2' fill='%23b3261e' fill-opacity='.2'/%3E%3Ccircle cx='28' cy='108' r='2' fill='%23fff8ec' fill-opacity='.35'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .06' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .2 0 0 0 0 .1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"), radial-gradient(120% 70% at 70% 0%, #d8b78c, #c6a276); }
-[data-ui][data-theme="packpapier"] .scene canvas { visibility: hidden; }
-:root[data-ui][data-theme="packpapier"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) {
-  background: #f4e9d4; border: 1.5px solid #23170e; box-shadow: 0 1px 0 rgba(35, 23, 14, .15), 0 8px 18px rgba(80, 50, 20, .18);
-}
-[data-ui][data-theme="packpapier"] .progress-card { position: relative; overflow: hidden; padding-top: 22px; }
-[data-ui][data-theme="packpapier"] .progress-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: repeating-linear-gradient(-60deg, #b3261e 0 5px, #f4e9d4 5px 8px); }
-[data-ui][data-theme="packpapier"] .stand-card.is-now { border-color: #b3261e; box-shadow: 0 0 0 1.5px #b3261e, 0 8px 18px rgba(80, 50, 20, .18); }
-[data-ui][data-theme="packpapier"] .stand-card.is-done .stand-thumb > img { filter: grayscale(.6) sepia(.4); }
-[data-ui][data-theme="packpapier"] .here-tag { background: transparent; color: #b3261e; border: 1.5px solid #b3261e; border-radius: 3px; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; transform: rotate(-4deg); }
-[data-ui][data-theme="packpapier"] .btn.primary { border: 1.5px solid #23170e; box-shadow: 0 2px 0 #23170e; }
-[data-ui][data-theme="packpapier"] .bottom-ui {
-  --ink: #f4e9d4; --ink-rgb: 244, 233, 212; --muted: #d4bf9f; --line: rgba(244, 233, 212, .18);
-  background: #23170e; color: var(--ink); border: 0; border-radius: 8px; box-shadow: 0 14px 30px rgba(60, 35, 10, .35);
-}
-[data-ui][data-theme="packpapier"] .bottom-ui .now-bar { background: rgba(244, 233, 212, .06); }
-[data-ui][data-theme="packpapier"] .bottom-ui .btn.primary { border-color: #f4e9d4; box-shadow: none; }
-[data-ui][data-theme="packpapier"] .dock button { border-radius: 4px; }
-[data-ui][data-theme="packpapier"] .progress-track i { border-radius: 1px; }
-[data-ui][data-theme="packpapier"] .style-chip { background: #f4e9d4; border: 1.5px solid #23170e; border-radius: 4px; }
-[data-ui][data-theme="packpapier"] .bottom-ui .now-info small { color: #f29a86; }
+/* ── Marktblatt: Zeitungspapier, Linien statt Karten, Schlagzeilen-Serife, Schwarz-Weiß-Fotos, Rot nur für Aktion ── */
+:root[data-ui][data-theme="marktblatt"] { --display: 'Instrument Serif', Georgia, serif; --radius: 0px; --radius-sm: 0px; --btn-radius: 2px; --line: rgba(20, 18, 16, .85); }
+[data-ui][data-theme="marktblatt"] .scene { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 .09 0 0 0 0 .07 0 0 0 .22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"), #efebe2; }
+[data-ui][data-theme="marktblatt"] .scene canvas { visibility: hidden; }
+[data-ui][data-theme="marktblatt"] h1, [data-ui][data-theme="marktblatt"] h2 { font-weight: 400; letter-spacing: -.01em; }
+:root[data-ui][data-theme="marktblatt"] .hero h1 { --hero-fit: 3.7; font-weight: 400; line-height: .9; letter-spacing: -.02em; }
+[data-ui][data-theme="marktblatt"] .hero h1 em { font-style: italic; }
+[data-ui][data-theme="marktblatt"] .hero { border-bottom: 4px double var(--ink); padding-bottom: 14px; }
+[data-ui][data-theme="marktblatt"] .hero .shiny { color: var(--ink); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); padding: 4px 0; letter-spacing: .14em; }
+[data-ui][data-theme="marktblatt"] .card-head h2, [data-ui][data-theme="marktblatt"] .section-head h2 { font-size: 30px; }
+[data-ui][data-theme="marktblatt"] .page-head h1 { font-size: 46px; }
+:root[data-ui][data-theme="marktblatt"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) { background: transparent; border: 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--ink); box-shadow: none; }
+[data-ui][data-theme="marktblatt"] .stand-list { gap: 0; }
+[data-ui][data-theme="marktblatt"] .stand-card + .stand-card, [data-ui][data-theme="marktblatt"] .stand-list > * + * .stand-card { border-top-width: 0; }
+[data-ui][data-theme="marktblatt"] .stand-card { border-top: 1px solid var(--ink); min-height: 120px; }
+[data-ui][data-theme="marktblatt"] .stand-thumb > img { filter: grayscale(1) contrast(1.15); -webkit-mask-image: none !important; mask-image: none !important; }
+[data-ui][data-theme="marktblatt"] .stand-card .stand-thumb { margin: 12px 0 12px 0; }
+[data-ui][data-theme="marktblatt"] .stand-main { margin-left: 0 !important; padding-left: 14px !important; }
+[data-ui][data-theme="marktblatt"] .stand-card.is-now .stand-thumb > img { filter: none; }
+[data-ui][data-theme="marktblatt"] .stand-main strong { font-family: var(--display); font-size: 25px; font-weight: 400; line-height: 1.05; }
+[data-ui][data-theme="marktblatt"] .stand-num { color: var(--ink); }
+[data-ui][data-theme="marktblatt"] .here-tag { background: var(--amber); color: #fff; border-radius: 0; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; }
+[data-ui][data-theme="marktblatt"] .progress-top strong { font-family: var(--display); font-size: 40px; font-weight: 400; color: var(--amber); }
+[data-ui][data-theme="marktblatt"] .progress-track i { border-radius: 0; height: 6px; }
+[data-ui][data-theme="marktblatt"] .progress-track i.on { background: var(--ink); }
+[data-ui][data-theme="marktblatt"] .btn.primary { box-shadow: none; text-transform: uppercase; letter-spacing: .06em; font-size: 14px; }
+[data-ui][data-theme="marktblatt"] .bottom-ui { --ink: #efebe2; --ink-rgb: 239, 235, 226; --muted: #b9b3a6; --line: rgba(239, 235, 226, .2); background: #141210; color: var(--ink); border: 0; border-radius: 0; box-shadow: 0 10px 24px rgba(0, 0, 0, .25); }
+[data-ui][data-theme="marktblatt"] .bottom-ui .now-bar { background: transparent; }
+[data-ui][data-theme="marktblatt"] .bottom-ui .now-info small { color: #ff8a8a; }
+[data-ui][data-theme="marktblatt"] .bottom-ui .now-num { border-radius: 0; }
+[data-ui][data-theme="marktblatt"] .dock button { border-radius: 0; text-transform: uppercase; letter-spacing: .06em; }
+[data-ui][data-theme="marktblatt"] .style-chip { background: #efebe2; border: 1px solid var(--ink); border-radius: 0; }
+[data-ui][data-theme="marktblatt"] .map-card, [data-ui][data-theme="marktblatt"] .map-card * { border-radius: 0; }

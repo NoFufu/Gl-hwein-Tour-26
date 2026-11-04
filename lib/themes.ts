@@ -44,27 +44,32 @@ export const themes: Theme[] = [
     scene: { bg: 'candy', particles: 'sparkle', density: .1, particleAlpha: .45, additive: true, night: [.09, .04, .05], plum: [.2, .07, .09], glow: [1, .85, .8], glow2: [1, .85, .8], warm1: [1, 1, 1], warm2: [1, .85, .55], glowStrength: 1 },
   },
   {
-    // Lebkuchenherz: dunkler Teig, Zuckerguss als gestrichelte Linie in Karten und Leiste, Rosa als Aktionsfarbe, Streusel im Hintergrund
-    id: 'lebkuchen', cup: 'weihnachtsmann', name: 'Lebkuchen', hint: 'Zuckerguss & Streusel',
-    vars: dark({ bg: '#2b1a12', bgRgb: '43, 26, 18', ink: '#fff7ef', inkRgb: '255, 247, 239', muted: '#e8d3c2', accent: '#ff9ebb', accentRgb: '255, 158, 187', accentInk: '#3a0f1d', berry: '#ff6f8e', berryRgb: '255, 111, 142', pine: '#a6dcae', pineRgb: '166, 220, 174', pineDeep: '#3d6b45', panelRgb: '75, 45, 29', panelSolid: '#3d2416', sceneGlow: '#4a2c1c' }),
-    scene: { bg: 'ginger', particles: 'snow', density: 0, particleAlpha: 0, additive: false, night: [.15, .09, .06], plum: [.3, .18, .11], glow: [1, .62, .73], glow2: [.65, .86, .68], warm1: [1, 1, 1], warm2: [1, 1, 1], glowStrength: 1 },
+    // Lichterkette: fast schwarze Nacht, eine bunte Glühbirnen-Kette als Bordüre, jede Stopp-Nummer leuchtet in ihrer Farbe
+    id: 'lichterkette', cup: 'weihnachtsmann', name: 'Lichterkette', hint: 'Bunte Birnen in der Nacht',
+    vars: dark({ bg: '#0c0a0f', bgRgb: '12, 10, 15', ink: '#f7f2ea', inkRgb: '247, 242, 234', muted: '#bcb4aa', accent: '#ffc845', accentRgb: '255, 200, 69', accentInk: '#241800', berry: '#ff5a5f', berryRgb: '255, 90, 95', pine: '#3ddc84', pineRgb: '61, 220, 132', pineDeep: '#1d6b41', panelRgb: '23, 20, 27', panelSolid: '#17141b', sceneGlow: '#1a1520' }),
+    scene: { bg: 'lights', particles: 'bokeh', density: .3, particleAlpha: .8, additive: true, night: [.035, .03, .045], plum: [.06, .05, .075], glow: [1, .35, .37], glow2: [.3, .64, 1], warm1: [1, .78, .27], warm2: [.24, .86, .52], glowStrength: 1 },
   },
   {
-    // Weihnachtspulli: kräftiges Rot statt dunkler Nacht, Creme als Aktionsfarbe, Strickmuster-Bordüren, breite kräftige Schrift
-    id: 'norweger', cup: 'norweger', name: 'Norweger', hint: 'Strickpulli in Rot & Creme',
-    vars: { ...dark({ bg: '#9e1426', bgRgb: '158, 20, 38', ink: '#fff3e3', inkRgb: '255, 243, 227', muted: '#ffd9cf', accent: '#fff3e3', accentRgb: '255, 243, 227', accentInk: '#8a0f20', berry: '#ffd27a', berryRgb: '255, 210, 122', pine: '#c4f0cc', pineRgb: '196, 240, 204', pineDeep: '#0f3b2b', panelRgb: '122, 13, 29', panelSolid: '#14402f', sceneGlow: '#b81c30' }), '--map-filter': 'grayscale(1) sepia(.5) hue-rotate(-30deg) saturate(1.6) brightness(.95)' },
-    scene: { bg: 'knit', particles: 'snow', density: .35, particleAlpha: .55, additive: true, night: [.5, .055, .11], plum: [.7, .1, .17], glow: [1, 1, 1], glow2: [1, 1, 1], warm1: [1, .96, .9], warm2: [1, .96, .9], glowStrength: 1 },
-  },
-  {
-    // Geschenkpapier: helles Kraftpapier mit gedruckten Sternen, Karten wie Anhänger mit Tintenrand, Rot wie ein Stempel
-    id: 'packpapier', cup: 'classic', name: 'Packpapier', hint: 'Geschenkpapier & Stempel', light: true,
+    // Frost: eisiges Hellblau, weiße Karten wie Eisplatten, Marineblau als Schrift und Leiste, breite geometrische Überschriften
+    id: 'frost', cup: 'eisbaer', name: 'Frost', hint: 'Eisig hell & klar', light: true,
     vars: {
-      '--bg': '#cdab80', '--bg-rgb': '205, 171, 128', '--ink': '#23170e', '--ink-rgb': '35, 23, 14', '--muted': '#4d3a29',
-      '--amber': '#b3261e', '--accent-rgb': '179, 38, 30', '--amber-ink': '#ffffff',
-      '--cranberry': '#b3261e', '--berry-rgb': '179, 38, 30', '--pine': '#2d5e3a', '--pine-rgb': '45, 94, 58', '--pine-deep': '#2d5e3a',
-      '--panel-rgb': '244, 233, 212', '--panel-solid': '#f4e9d4', '--scene-glow': '#d8b78c', '--map-filter': 'sepia(.45) saturate(.9)', 'color-scheme': 'light',
+      '--bg': '#e4eef6', '--bg-rgb': '228, 238, 246', '--ink': '#0e2236', '--ink-rgb': '14, 34, 54', '--muted': '#3d5670',
+      '--amber': '#1d4fd8', '--accent-rgb': '29, 79, 216', '--amber-ink': '#ffffff',
+      '--cranberry': '#c62845', '--berry-rgb': '198, 40, 69', '--pine': '#0f7a5c', '--pine-rgb': '15, 122, 92', '--pine-deep': '#0f7a5c',
+      '--panel-rgb': '255, 255, 255', '--panel-solid': '#ffffff', '--scene-glow': '#f4f9fd', '--map-filter': 'saturate(.4) hue-rotate(-10deg) brightness(1.05)', 'color-scheme': 'light',
     },
-    scene: { bg: 'kraft', particles: 'snow', density: 0, particleAlpha: 0, additive: false, night: [.75, .6, .43], plum: [.83, .69, .52], glow: [.62, .12, .1], glow2: [.95, .9, .82], warm1: [1, 1, 1], warm2: [1, 1, 1], glowStrength: 1 },
+    scene: { bg: 'globe', particles: 'snow', density: .55, particleAlpha: .9, additive: false, night: [.93, .96, .985], plum: [.8, .88, .95], glow: [.55, .75, 1], glow2: [.55, .75, 1], warm1: [.62, .76, .9], warm2: [.75, .85, .95], glowStrength: .5 },
+  },
+  {
+    // Marktblatt: Zeitungspapier, schwarze Linien statt Karten, Schlagzeilen-Serife, Fotos in Schwarz-Weiß, Rot nur für Aktion
+    id: 'marktblatt', cup: 'classic', name: 'Marktblatt', hint: 'Wie eine Zeitung', light: true,
+    vars: {
+      '--bg': '#efebe2', '--bg-rgb': '239, 235, 226', '--ink': '#141210', '--ink-rgb': '20, 18, 16', '--muted': '#4c4840',
+      '--amber': '#c8102e', '--accent-rgb': '200, 16, 46', '--amber-ink': '#ffffff',
+      '--cranberry': '#c8102e', '--berry-rgb': '200, 16, 46', '--pine': '#1f5c3a', '--pine-rgb': '31, 92, 58', '--pine-deep': '#1f5c3a',
+      '--panel-rgb': '239, 235, 226', '--panel-solid': '#efebe2', '--scene-glow': '#efebe2', '--map-filter': 'grayscale(1) contrast(1.05)', 'color-scheme': 'light',
+    },
+    scene: { bg: 'clean', particles: 'snow', density: 0, particleAlpha: 0, additive: false, night: [.937, .922, .886], plum: [.937, .922, .886], glow: [1, 1, 1], glow2: [1, 1, 1], warm1: [1, 1, 1], warm2: [1, 1, 1], glowStrength: 0 },
   },
   {
     id: 'schnee', cup: 'schneemann', name: 'Schneekugel', hint: 'Hell, Wolken & Flocken', light: true,
