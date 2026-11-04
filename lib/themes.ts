@@ -44,6 +44,29 @@ export const themes: Theme[] = [
     scene: { bg: 'candy', particles: 'sparkle', density: .1, particleAlpha: .45, additive: true, night: [.09, .04, .05], plum: [.2, .07, .09], glow: [1, .85, .8], glow2: [1, .85, .8], warm1: [1, 1, 1], warm2: [1, .85, .55], glowStrength: 1 },
   },
   {
+    // Lebkuchenherz: dunkler Teig, Zuckerguss als gestrichelte Linie in Karten und Leiste, Rosa als Aktionsfarbe, Streusel im Hintergrund
+    id: 'lebkuchen', cup: 'weihnachtsmann', name: 'Lebkuchen', hint: 'Zuckerguss & Streusel',
+    vars: dark({ bg: '#2b1a12', bgRgb: '43, 26, 18', ink: '#fff7ef', inkRgb: '255, 247, 239', muted: '#e8d3c2', accent: '#ff9ebb', accentRgb: '255, 158, 187', accentInk: '#3a0f1d', berry: '#ff6f8e', berryRgb: '255, 111, 142', pine: '#a6dcae', pineRgb: '166, 220, 174', pineDeep: '#3d6b45', panelRgb: '75, 45, 29', panelSolid: '#3d2416', sceneGlow: '#4a2c1c' }),
+    scene: { bg: 'ginger', particles: 'snow', density: 0, particleAlpha: 0, additive: false, night: [.15, .09, .06], plum: [.3, .18, .11], glow: [1, .62, .73], glow2: [.65, .86, .68], warm1: [1, 1, 1], warm2: [1, 1, 1], glowStrength: 1 },
+  },
+  {
+    // Weihnachtspulli: kräftiges Rot statt dunkler Nacht, Creme als Aktionsfarbe, Strickmuster-Bordüren, breite kräftige Schrift
+    id: 'norweger', cup: 'norweger', name: 'Norweger', hint: 'Strickpulli in Rot & Creme',
+    vars: { ...dark({ bg: '#9e1426', bgRgb: '158, 20, 38', ink: '#fff3e3', inkRgb: '255, 243, 227', muted: '#ffd9cf', accent: '#fff3e3', accentRgb: '255, 243, 227', accentInk: '#8a0f20', berry: '#ffd27a', berryRgb: '255, 210, 122', pine: '#c4f0cc', pineRgb: '196, 240, 204', pineDeep: '#0f3b2b', panelRgb: '122, 13, 29', panelSolid: '#14402f', sceneGlow: '#b81c30' }), '--map-filter': 'grayscale(1) sepia(.5) hue-rotate(-30deg) saturate(1.6) brightness(.95)' },
+    scene: { bg: 'knit', particles: 'snow', density: .35, particleAlpha: .55, additive: true, night: [.5, .055, .11], plum: [.7, .1, .17], glow: [1, 1, 1], glow2: [1, 1, 1], warm1: [1, .96, .9], warm2: [1, .96, .9], glowStrength: 1 },
+  },
+  {
+    // Geschenkpapier: helles Kraftpapier mit gedruckten Sternen, Karten wie Anhänger mit Tintenrand, Rot wie ein Stempel
+    id: 'packpapier', cup: 'classic', name: 'Packpapier', hint: 'Geschenkpapier & Stempel', light: true,
+    vars: {
+      '--bg': '#cdab80', '--bg-rgb': '205, 171, 128', '--ink': '#23170e', '--ink-rgb': '35, 23, 14', '--muted': '#4d3a29',
+      '--amber': '#b3261e', '--accent-rgb': '179, 38, 30', '--amber-ink': '#ffffff',
+      '--cranberry': '#b3261e', '--berry-rgb': '179, 38, 30', '--pine': '#2d5e3a', '--pine-rgb': '45, 94, 58', '--pine-deep': '#2d5e3a',
+      '--panel-rgb': '244, 233, 212', '--panel-solid': '#f4e9d4', '--scene-glow': '#d8b78c', '--map-filter': 'sepia(.45) saturate(.9)', 'color-scheme': 'light',
+    },
+    scene: { bg: 'kraft', particles: 'snow', density: 0, particleAlpha: 0, additive: false, night: [.75, .6, .43], plum: [.83, .69, .52], glow: [.62, .12, .1], glow2: [.95, .9, .82], warm1: [1, 1, 1], warm2: [1, 1, 1], glowStrength: 1 },
+  },
+  {
     id: 'schnee', cup: 'schneemann', name: 'Schneekugel', hint: 'Hell, Wolken & Flocken', light: true,
     vars: {
       '--bg': '#f4efe8', '--bg-rgb': '244, 239, 232', '--ink': '#231c1f', '--ink-rgb': '35, 28, 31', '--muted': '#564c4f',

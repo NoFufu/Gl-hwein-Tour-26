@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@fontsource-variable/archivo':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource-variable/bricolage-grotesque':
         specifier: ^5.3.0
         version: 5.3.0
@@ -15,6 +18,9 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource-variable/fredoka':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource-variable/grandstander':
         specifier: ^5.3.0
         version: 5.3.0
       '@fontsource-variable/instrument-sans':
@@ -75,6 +81,9 @@ packages:
   '@emnapi/runtime@1.11.3':
     resolution: {integrity: sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==}
 
+  '@fontsource-variable/archivo@5.3.0':
+    resolution: {integrity: sha512-HogK8FJelrD1o7TlZlkIVtHgc20bO5PZRWE7mUeUTdMN055alznQV6/00J00IBeu8FQAH4s3zW9UJNvKExXf+g==}
+
   '@fontsource-variable/bricolage-grotesque@5.3.0':
     resolution: {integrity: sha512-TLi9Q4hJjS2UvoTMRSS2nHu6c4R56lAw60NR9QYtVRCHn0XtsFpiEhNffZ8Glsoxu6wEEwLKBP8lb94J52PNBA==}
 
@@ -83,6 +92,9 @@ packages:
 
   '@fontsource-variable/fredoka@5.3.0':
     resolution: {integrity: sha512-13w98iw2RcmYfZQRZPLSu+0YJK3HHm5A2XrpU26moFIAePmfiKfvkmEJUgkc8r5GNR+pbDijOueS1KdGAMAWmQ==}
+
+  '@fontsource-variable/grandstander@5.3.0':
+    resolution: {integrity: sha512-vD2bm4My0+kgUxIZ6J+CSKMonbbxxMF0dWq4uQYJP2ZNyHC+ss1XZPu/WCRB72K15+gaLs97UfR6UWU6a2GmvA==}
 
   '@fontsource-variable/instrument-sans@5.3.0':
     resolution: {integrity: sha512-u4gKbDBTNFGkg997tfQn3eHOhHuquWUFTRT/rwzuKtrxX5P2ekfs2x+LgBPP4P32+cC+vUwF1Cr+IdRoPQbrGw==}
@@ -565,11 +577,15 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
+  '@fontsource-variable/archivo@5.3.0': {}
+
   '@fontsource-variable/bricolage-grotesque@5.3.0': {}
 
   '@fontsource-variable/fraunces@5.3.0': {}
 
   '@fontsource-variable/fredoka@5.3.0': {}
+
+  '@fontsource-variable/grandstander@5.3.0': {}
 
   '@fontsource-variable/instrument-sans@5.3.0': {}
 

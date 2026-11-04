@@ -6,7 +6,7 @@ import type { Theme } from '../lib/themes';
 // Hintergrund je Design: ein Vollbild-Shader (Nebel, Tannenwald, Polarlicht, Zuckerstange, Schneekugel)
 // plus Partikel (Bokeh, Schnee, Sterne, Glitzer). Reagiert sanft auf Finger und Maus.
 // Niedrige Auflösung, ~30 fps, pausiert im Hintergrund, bei reduzierter Bewegung nur ein Standbild.
-const BG_MODES = { fog: 0, forest: 1, aurora: 2, candy: 3, globe: 4, clean: 5 } as const;
+const BG_MODES = { fog: 0, forest: 1, aurora: 2, candy: 3, globe: 4, clean: 5, ginger: 6, knit: 7, kraft: 8 } as const;
 const PT_MODES = { bokeh: 0, snow: 1, stars: 2, sparkle: 3 } as const;
 export type SceneBg = keyof typeof BG_MODES;
 export type SceneParticles = keyof typeof PT_MODES;
@@ -15,6 +15,7 @@ const bgFrag = `
 uniform float uTime, uMode, uGlowStrength; uniform vec2 uRes, uMouse; uniform vec3 uNight, uPlum, uGlow, uGlow2; varying vec2 vUv;
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+float seg(vec2 p,vec2 a,vec2 b){vec2 pa=p-a,ba=b-a;float k=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*k);}
 float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.02;a*=.5;}return v;}
 float stars(vec2 uv, float asp, float dens){vec2 q=uv*vec2(asp,1.)*dens,g=floor(q);vec2 f=fract(q)-.5-(vec2(h(g+1.3),h(g+2.7))-.5)*.6;float s=step(.975,h(g))*smoothstep(.16,.02,length(f));return s*(.45+.55*sin(uTime*1.7+h(g+7.)*60.));}
 void main(){
@@ -60,6 +61,27 @@ void main(){
     float s=smoothstep(.15,.85,.5+.5*sin(w*6.2831));
     col=mix(uNight,uPlum,s*.32+smoothstep(1.4,.0,r)*.25);
     col*=.85+.15*smoothstep(1.6,.2,length(uv-.5));
+  } else if(uMode>7.5){ // Packpapier: Kraftpapier-Fasern, darauf blass gedruckte Sterne wie Geschenkpapier
+    vec2 p=uv*vec2(asp,1.);
+    float fib=n(p*vec2(220.,14.))*.55+n(p*vec2(16.,240.))*.45;
+    col=mix(uNight,uPlum,fbm(p*2.5+m*.05)*.7+fib*.35);
+    vec2 q=p*4.2+vec2(0.,t*.01); q.x+=mod(floor(q.y),2.)*.5; vec2 g=floor(q), f=fract(q)-.5;
+    float ang=atan(f.y,f.x)+h(g)*6.28, r=length(f);
+    float star=smoothstep(.015,0.,r-(.1+.05*cos(ang*5.)))*step(.3,h(g+3.));
+    col=mix(col,mix(uGlow,uGlow2,step(.6,h(g+5.))),star*.2);
+  } else if(uMode>6.5){ // Norweger: Strickmaschen (V-Stiche), ganz leicht
+    vec2 q=uv*vec2(asp,1.)*vec2(26.,34.)+m*.4; vec2 g=floor(q), f=fract(q);
+    float d=min(seg(f,vec2(.08,.95),vec2(.46,.12)),seg(f,vec2(.92,.95),vec2(.54,.12)));
+    float st=smoothstep(.2,.02,d)*(.75+.25*h(g));
+    col=mix(uNight,uPlum,smoothstep(1.2,.0,length(uv-vec2(.5,1.05))));
+    col*=.9+.13*st;
+  } else if(uMode>5.5){ // Lebkuchen: warmer Teig, verstreute Zuckerstreusel
+    col=mix(uNight,uPlum,smoothstep(1.2,0.,length((uv-vec2(.75,1.))*vec2(asp,1.))));
+    vec2 p=uv*vec2(asp,1.)*8.+vec2(0.,t*.02); vec2 g=floor(p), f=fract(p)-.5;
+    float rnd=h(g), ang=rnd*6.28+t*.05; vec2 dir=vec2(cos(ang),sin(ang)), c=(vec2(h(g+1.7),h(g+4.1))-.5)*.5;
+    float spr=smoothstep(.055,.03,seg(f,c-dir*.11,c+dir*.11))*step(.5,h(g+9.));
+    vec3 sc=rnd<.33?uGlow:rnd<.66?uGlow2:vec3(1.,.97,.93);
+    col=mix(col,sc,spr*.28);
   } else if(uMode>4.5){ // Clean: ruhiger, kaum sichtbarer Verlauf ohne Bewegung
     col=mix(uPlum,uNight,smoothstep(0.,.7,uv.y));
   } else { // Schneekugel: hell, weiche Wolken

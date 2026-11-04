@@ -783,7 +783,7 @@ li.ok .guide-icon { background: rgba(var(--pine-rgb), .16); color: var(--pine); 
 /* ═════════ Taste-Skill: Überschriften-Schrift, kein Glow, kein Verlaufstext ═════════ */
 /* Fraunces ist laut Skill ein typischer KI-Default. Marktnacht/Tannenwald: Bricolage Grotesque (warm, eigenwillig),
    Polarlicht: Outfit. Zuckerstange (Fredoka) und Schneekugel (Playfair) behalten ihre Schrift. */
-:root[data-ui]:not([data-theme="zuckerstange"]):not([data-theme="schnee"]):not([data-theme="mitternacht"]):not([data-theme="clean"]) { --display: 'Bricolage Grotesque Variable', system-ui, sans-serif; }
+:root[data-ui]:not([data-theme="zuckerstange"]):not([data-theme="schnee"]):not([data-theme="mitternacht"]):not([data-theme="clean"]):not([data-theme="lebkuchen"]):not([data-theme="norweger"]):not([data-theme="packpapier"]) { --display: 'Bricolage Grotesque Variable', system-ui, sans-serif; }
 :root[data-ui][data-theme="mitternacht"] { --display: 'Outfit Variable', system-ui, sans-serif; }
 [data-ui] h1, [data-ui] h2 { font-weight: 700; letter-spacing: -.025em; }
 [data-ui] .hero h1 { font-weight: 800; letter-spacing: -.035em; line-height: .98; }

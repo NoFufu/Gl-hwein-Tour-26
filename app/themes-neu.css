@@ -1,0 +1,73 @@
+/* ═════════ Neue Design-Kandidaten statt Zuckerstange (Nov. 2026) ═════════
+   Jedes ändert mehr als Farben: Material der Karten, Form, Schrift und Hintergrund. */
+
+/* ── Lebkuchen: Teig-Karten mit gestricheltem Zuckerguss, Rosa als Aktion, verspielte Schrift ── */
+:root[data-ui][data-theme="lebkuchen"] { --display: 'Grandstander Variable', system-ui, sans-serif; --radius: 24px; --radius-sm: 20px; --btn-radius: 999px; --icing: rgba(255, 247, 239, .55); }
+[data-ui][data-theme="lebkuchen"] h1, [data-ui][data-theme="lebkuchen"] h2 { font-weight: 800; letter-spacing: -.01em; }
+:root[data-ui][data-theme="lebkuchen"] .hero h1 { --hero-fit: 4.9; font-weight: 900; letter-spacing: -.02em; }
+:root[data-ui][data-theme="lebkuchen"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) {
+  background: #4b2d1d; border: 0; outline: 2px dashed var(--icing); outline-offset: -7px; box-shadow: 0 3px 0 #21130b, 0 14px 30px rgba(0, 0, 0, .35);
+}
+[data-ui][data-theme="lebkuchen"] .stand-card { outline-offset: -6px; }
+[data-ui][data-theme="lebkuchen"] .stand-card.is-now { outline: 2px dashed var(--amber); }
+[data-ui][data-theme="lebkuchen"] .btn.primary, [data-ui][data-theme="lebkuchen"] .dock button.active { box-shadow: inset 0 0 0 3px var(--amber), inset 0 0 0 5px #fff7ef; }
+[data-ui][data-theme="lebkuchen"] .bottom-ui { background: #3d2416; border: 0; outline: 2px dashed var(--icing); outline-offset: -6px; }
+[data-ui][data-theme="lebkuchen"] .bottom-ui .now-bar { background: rgba(255, 158, 187, .1); border-bottom: 2px dashed rgba(255, 247, 239, .25); }
+[data-ui][data-theme="lebkuchen"] .here-tag { background: var(--amber); color: var(--amber-ink); }
+[data-ui][data-theme="lebkuchen"] .progress-track i { height: 10px; }
+[data-ui][data-theme="lebkuchen"] .style-chip { background: #4b2d1d; border: 2px dashed var(--icing); }
+
+/* ── Norweger: rotes Strickpulli-Feld, Bordüren im Strickmuster, Creme als Aktion, breite kräftige Schrift ── */
+:root[data-ui][data-theme="norweger"] {
+  --display: 'Archivo Variable', system-ui, sans-serif; --text: 'Archivo Variable', system-ui, sans-serif;
+  --radius: 6px; --radius-sm: 4px; --btn-radius: 4px; --line: rgba(255, 243, 227, .22);
+  --knit: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='22' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff3e3' d='M0 0h2v2h-2zM4 0h2v2h-2zM8 0h2v2h-2zM12 0h2v2h-2zM16 0h2v2h-2zM20 0h2v2h-2zM10 4h2v2h-2zM8 6h2v2h-2zM10 6h2v2h-2zM12 6h2v2h-2zM22 6h2v2h-2zM6 8h2v2h-2zM8 8h2v2h-2zM12 8h2v2h-2zM14 8h2v2h-2zM4 10h2v2h-2zM6 10h2v2h-2zM14 10h2v2h-2zM16 10h2v2h-2zM6 12h2v2h-2zM8 12h2v2h-2zM12 12h2v2h-2zM14 12h2v2h-2zM8 14h2v2h-2zM10 14h2v2h-2zM12 14h2v2h-2zM22 14h2v2h-2zM10 16h2v2h-2zM0 20h2v2h-2zM4 20h2v2h-2zM8 20h2v2h-2zM12 20h2v2h-2zM16 20h2v2h-2zM20 20h2v2h-2z'/%3E%3C/svg%3E"); --knit-red: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='22' shape-rendering='crispEdges'%3E%3Cpath fill='%239e1426' d='M0 0h2v2h-2zM4 0h2v2h-2zM8 0h2v2h-2zM12 0h2v2h-2zM16 0h2v2h-2zM20 0h2v2h-2zM10 4h2v2h-2zM8 6h2v2h-2zM10 6h2v2h-2zM12 6h2v2h-2zM22 6h2v2h-2zM6 8h2v2h-2zM8 8h2v2h-2zM12 8h2v2h-2zM14 8h2v2h-2zM4 10h2v2h-2zM6 10h2v2h-2zM14 10h2v2h-2zM16 10h2v2h-2zM6 12h2v2h-2zM8 12h2v2h-2zM12 12h2v2h-2zM14 12h2v2h-2zM8 14h2v2h-2zM10 14h2v2h-2zM12 14h2v2h-2zM22 14h2v2h-2zM10 16h2v2h-2zM0 20h2v2h-2zM4 20h2v2h-2zM8 20h2v2h-2zM12 20h2v2h-2zM16 20h2v2h-2zM20 20h2v2h-2z'/%3E%3C/svg%3E");
+}
+[data-ui][data-theme="norweger"] h1, [data-ui][data-theme="norweger"] h2 { font-weight: 850; font-stretch: 108%; letter-spacing: -.01em; }
+:root[data-ui][data-theme="norweger"] .hero h1 { --hero-fit: 5.3; font-weight: 900; font-stretch: 125%; letter-spacing: -.015em; line-height: .95; }
+[data-ui][data-theme="norweger"] .hero h1 em { color: #ffd27a; }
+[data-ui][data-theme="norweger"] .hero { padding-bottom: 34px; }
+[data-ui][data-theme="norweger"] .hero::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 22px; background: var(--knit) repeat-x center; opacity: .9; }
+:root[data-ui][data-theme="norweger"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) {
+  background: #7a0d1d; border: 0; box-shadow: inset 0 0 0 1px rgba(255, 243, 227, .14), 0 10px 24px rgba(60, 0, 8, .35);
+}
+[data-ui][data-theme="norweger"] .progress-card { position: relative; padding-top: 38px; overflow: hidden; }
+[data-ui][data-theme="norweger"] .progress-card::before { content: ''; position: absolute; left: 0; right: 0; top: 8px; height: 22px; background: var(--knit) repeat-x center; opacity: .55; }
+[data-ui][data-theme="norweger"] .stand-card.is-now { box-shadow: inset 0 0 0 2px var(--amber); }
+[data-ui][data-theme="norweger"] .stand-main strong { font-stretch: 110%; font-weight: 750; }
+[data-ui][data-theme="norweger"] .btn.primary { box-shadow: 0 3px 0 rgba(60, 0, 8, .45); font-weight: 800; }
+[data-ui][data-theme="norweger"] .bottom-ui { background: #14402f; border: 0; border-radius: 8px; padding-top: 22px; }
+[data-ui][data-theme="norweger"] .bottom-ui::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 22px; background: #fff3e3 var(--knit-red) repeat-x center; }
+[data-ui][data-theme="norweger"] .bottom-ui .now-bar { background: rgba(255, 243, 227, .06); border-bottom-color: rgba(255, 243, 227, .16); }
+[data-ui][data-theme="norweger"] .dock button { border-radius: 4px; }
+[data-ui][data-theme="norweger"] .here-tag { background: #ffd27a; color: #5a0812; }
+[data-ui][data-theme="norweger"] .progress-track i { border-radius: 2px; height: 10px; }
+[data-ui][data-theme="norweger"] .style-chip { border-radius: 4px; background: #7a0d1d; }
+[data-ui][data-theme="norweger"] .shiny { color: #ffd27a; }
+
+/* ── Packpapier: helles Kraftpapier, Karten als Anhänger mit Tintenrand, Rot wie ein Stempel, Serifenschrift ── */
+:root[data-ui][data-theme="packpapier"] { --display: 'Fraunces Variable', Georgia, serif; --radius: 6px; --radius-sm: 4px; --btn-radius: 4px; --line: rgba(35, 23, 14, .35); }
+[data-ui][data-theme="packpapier"] h1, [data-ui][data-theme="packpapier"] h2 { font-weight: 700; letter-spacing: -.02em; font-variation-settings: 'SOFT' 30, 'WONK' 1, 'opsz' 144; }
+:root[data-ui][data-theme="packpapier"] .hero h1 { --hero-fit: 4.5; font-weight: 800; }
+[data-ui][data-theme="packpapier"] .hero h1 em { font-style: italic; font-weight: 600; }
+[data-ui][data-theme="packpapier"] .scene { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cpath d='M0,-9 L2.6,-3.2 L8.6,-2.8 L4,1.2 L5.3,7.3 L0,4.1 L-5.3,7.3 L-4,1.2 L-8.6,-2.8 L-2.6,-3.2Z' fill='%23b3261e' fill-opacity='.22' transform='translate(30 34) rotate(12)'/%3E%3Cpath d='M0,-9 L2.6,-3.2 L8.6,-2.8 L4,1.2 L5.3,7.3 L0,4.1 L-5.3,7.3 L-4,1.2 L-8.6,-2.8 L-2.6,-3.2Z' fill='%23fff8ec' fill-opacity='.35' transform='translate(100 100) rotate(-18) scale(.8)'/%3E%3Ccircle cx='104' cy='30' r='2.2' fill='%23b3261e' fill-opacity='.2'/%3E%3Ccircle cx='28' cy='108' r='2' fill='%23fff8ec' fill-opacity='.35'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .06' numOctaves='3' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .2 0 0 0 0 .1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"), radial-gradient(120% 70% at 70% 0%, #d8b78c, #c6a276); }
+[data-ui][data-theme="packpapier"] .scene canvas { visibility: hidden; }
+:root[data-ui][data-theme="packpapier"] :where(.card, .stats, .progress-card, .stand-card, .people li, .guide-steps > li) {
+  background: #f4e9d4; border: 1.5px solid #23170e; box-shadow: 0 1px 0 rgba(35, 23, 14, .15), 0 8px 18px rgba(80, 50, 20, .18);
+}
+[data-ui][data-theme="packpapier"] .progress-card { position: relative; overflow: hidden; padding-top: 22px; }
+[data-ui][data-theme="packpapier"] .progress-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: repeating-linear-gradient(-60deg, #b3261e 0 5px, #f4e9d4 5px 8px); }
+[data-ui][data-theme="packpapier"] .stand-card.is-now { border-color: #b3261e; box-shadow: 0 0 0 1.5px #b3261e, 0 8px 18px rgba(80, 50, 20, .18); }
+[data-ui][data-theme="packpapier"] .stand-card.is-done .stand-thumb > img { filter: grayscale(.6) sepia(.4); }
+[data-ui][data-theme="packpapier"] .here-tag { background: transparent; color: #b3261e; border: 1.5px solid #b3261e; border-radius: 3px; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; transform: rotate(-4deg); }
+[data-ui][data-theme="packpapier"] .btn.primary { border: 1.5px solid #23170e; box-shadow: 0 2px 0 #23170e; }
+[data-ui][data-theme="packpapier"] .bottom-ui {
+  --ink: #f4e9d4; --ink-rgb: 244, 233, 212; --muted: #d4bf9f; --line: rgba(244, 233, 212, .18);
+  background: #23170e; color: var(--ink); border: 0; border-radius: 8px; box-shadow: 0 14px 30px rgba(60, 35, 10, .35);
+}
+[data-ui][data-theme="packpapier"] .bottom-ui .now-bar { background: rgba(244, 233, 212, .06); }
+[data-ui][data-theme="packpapier"] .bottom-ui .btn.primary { border-color: #f4e9d4; box-shadow: none; }
+[data-ui][data-theme="packpapier"] .dock button { border-radius: 4px; }
+[data-ui][data-theme="packpapier"] .progress-track i { border-radius: 1px; }
+[data-ui][data-theme="packpapier"] .style-chip { background: #f4e9d4; border: 1.5px solid #23170e; border-radius: 4px; }
+[data-ui][data-theme="packpapier"] .bottom-ui .now-info small { color: #f29a86; }
