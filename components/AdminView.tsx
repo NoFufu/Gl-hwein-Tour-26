@@ -109,7 +109,7 @@ export default function AdminView({ store, stands, adminKey, adminName, currentI
           ))}
         </ol>
         <div className="admin-body">
-          <button type="button" className="link-btn" disabled={busy} onClick={() => { if (confirm('Standardliste von 2025 wiederherstellen? Eigene Änderungen gehen verloren.')) save(defaultStands, 'Standardliste wiederhergestellt.'); }}><RotateCcw size={14} /> Standardliste wiederherstellen</button>
+          <button type="button" className="link-btn" disabled={busy} onClick={() => { if (confirm('Standardliste 2026 wiederherstellen? Eigene Änderungen gehen verloren.')) save(defaultStands, 'Standardliste wiederhergestellt.'); }}><RotateCcw size={14} /> Standardliste wiederherstellen</button>
         </div>
       </section>
 
