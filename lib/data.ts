@@ -17,47 +17,80 @@ export const photoCredit = 'Foto: Bielefeld Marketing GmbH | Tim Fröhlich';
 const photo = (name: string) => ({ image: asset(`/fotos/${name}.jpg`), thumb: asset(`/fotos/${name}-klein.jpg`), credit: photoCredit });
 const marketing: StandSource = { title: 'Bielefeld Marketing · 04.11.2025', url: 'https://www.bielefeld-marketing.de/pressemeldung/bielefeld-laedt-weihnachtsmarkt' };
 
-// Season IDs keep ratings of the former invented stands separate.
+const list2026 = 'Laut Standliste 2026 für die Bielefelder Innenstadt (Markt vom 19.11. bis 30.12.2026, So bis Do 12 bis 21 Uhr, Fr/Sa 12 bis 22 Uhr).';
+const noPhoto = { image: asset('/illustrations/markt-abend.svg') };
+
+// Season IDs keep ratings of the former invented stands separate. Stands that already
+// existed in 2025 keep their wm2025 id so their ratings stay attached.
 // Coordinates identify the documented square/street, not the exact stall.
 export const defaultStands: Stand[] = [
  {
-  id: 'wm2025-lions', name: 'Lions-Häuschen', place: 'Alter Markt',
-  wine: 'Roter & weißer Glühwein', description: 'Glühwein für den guten Zweck. 2025 gab es erstmals auch weißen Glühwein sowie alkoholfreien Claire de Lune.',
-  coords: [8.5322820, 52.0206116], ...photo('lions'),
-  sources: [{ title: 'Lions Club Bielefeld Phoenix · November 2025', url: 'https://www.lions-phoenix.com/presse/2025/11/21/dieses-jahr-mit-berraschung-wir-haben-jetzt-auch-weien-glhwein' }, { title: 'Lions Bielefeld Sparrenberg · Saison 2025', url: 'https://www.lc-bi-sparrenberg.de/lions-bielefeld-sparrenberg/aktuelles/' }]
+  id: 'wm2025-pyramide', name: 'Weihnachtspyramide', place: 'Jahnplatz',
+  wine: 'Glühwein & weitere Heißgetränke', description: `Die begehbare Weihnachtspyramide im Hüttendorf am Jahnplatz, laut Veranstalter die größte in Nordrhein-Westfalen. ${list2026}`,
+  coords: [8.5329917, 52.0231648], ...photo('pyramide'), sources: [marketing]
  },
  {
-  id: 'wm2025-almhuette', name: 'Krauses Almhütte', place: 'Bunnemannplatz',
-  wine: 'Weißer Glühwein & Kinderpunsch', description: 'Eine warme Almhütte zwischen Obernstraße und Bunnemannplatz. Weißer Glühwein und Kinderpunsch waren 2025 angekündigt.',
-  coords: [8.5295743, 52.0193913], ...photo('almhuette'), sources: [marketing]
+  id: 'wm2026-duenhoelter', name: 'Dünhölter Weinhandel', place: 'Alter Markt',
+  wine: 'Glühwein', description: `Der Glühweinstand des Weinhandels Dünhölter am Alten Markt. ${list2026}`,
+  coords: [8.5325200, 52.0207300], ...noPhoto, sources: []
  },
  {
-  id: 'wm2025-fels', name: 'Weihnacht unter dem Fels', place: 'Klosterplatz',
-  wine: 'Glühwein & Punsch', description: 'Das Weihnachtsmarkt-Areal von André Hans Schneider am Klosterplatz: Heißgetränke und eine Lounge im Fels.',
-  coords: [8.5285503, 52.0208272], ...photo('fels'),
-  sources: [{ title: 'Neue Westfälische · Weihnachtsmarkt 2025', url: 'https://www.nw.de/lokal/bielefeld/mitte/23899144_Bielefelder-Weihnachtsmarkt-2025-schliesst-bald-Oeffnungszeiten-Preise-und-Staende.html' }, { title: 'Betreiber · Klosterplatz (aktuelle Website)', url: 'https://www.weihnachtsmarkt-klosterplatz.de/' }]
+  id: 'wm2026-gluehwuermchen', name: 'Glühwürmchen', place: 'Alter Markt',
+  wine: 'Glühwein', description: `Glühweinstand am Alten Markt. ${list2026}`,
+  coords: [8.5320300, 52.0204900], ...noPhoto, sources: []
  },
  {
-  id: 'wm2025-nikolaus', name: 'Haus vom Nikolaus', place: 'Altstädter Kirchpark',
-  wine: 'Feuerzangenbowle', description: 'Der rustikale Stopp im Kirchpark. Für 2025 ist Feuerzangenbowle ausdrücklich belegt — eine Alternative zum klassischen Glühwein.',
+  id: 'wm2025-nikolaus', name: 'Haus vom Nikolaus', place: 'Altstädter Kirchpark am Leineweber',
+  wine: 'Glühwein & Feuerzangenbowle', description: `Der rustikale Stopp im Kirchpark am Leineweber-Denkmal, auch mit Feuerzangenbowle. ${list2026}`,
   coords: [8.5321475, 52.0210376], ...photo('nikolaus'), sources: [marketing]
  },
  {
-  id: 'wm2025-gluehbar', name: 'Glüh-Bar', place: 'Niedernstraße',
-  wine: 'Glühwein, Glühbier & mehr', description: 'Die Glüh-Bar wurde 2025 in der Niedernstraße genannt. In dem Abschnitt zwischen Alter Markt und Nicolaikirche gab es laut Presse auch Glühbier. Eine konkrete Getränkekarte der Glüh-Bar ist nicht dokumentiert.',
+  id: 'wm2025-gluehbar', name: 'GlühBar', place: 'Niedernstraße',
+  wine: 'Glühwein & mehr', description: `Die GlühBar in der Niedernstraße zwischen Alter Markt und Jahnplatz. ${list2026}`,
   coords: [8.5317787, 52.0222174], ...photo('gluehbar'),
   sources: [{ title: 'Bielefeld Marketing · 20.11.2025', url: 'https://www.bielefeld-marketing.de/pressemeldung/bielefeldjetzt-app-weihnachtsmarktbesuch-planen' }]
  },
  {
-  id: 'wm2025-pyramide', name: 'Weihnachtspyramide', place: 'Jahnplatz',
-  wine: 'Glühwein & weitere Heißgetränke', description: 'Die begehbare Weihnachtspyramide im Hüttendorf am Jahnplatz, laut Veranstalter die größte in Nordrhein-Westfalen. Glühwein und weitere Heißgetränke waren 2025 angekündigt.',
-  coords: [8.5329917, 52.0231648], ...photo('pyramide'), sources: [marketing]
+  id: 'wm2026-knigge', name: 'Café Knigge', place: 'Niedernstraße & Bahnhofstraße',
+  wine: 'Glühwein', description: `Café Knigge schenkt an zwei Stellen aus: in der Niedernstraße und in der Bahnhofstraße. Der Kartenpunkt liegt in der Niedernstraße. ${list2026}`,
+  coords: [8.5321500, 52.0226500], ...noPhoto, sources: []
  },
  {
-  id: 'wm2025-bahnhofstr', name: 'Glühweinstände Bahnhofstraße', place: 'Bahnhofstraße',
-  wine: 'Glühwein', description: 'Entlang der Bahnhofstraße standen 2025 Glühweinstände am Rand des Marktgebiets. Einzelne Betreiber sind in den Quellen nicht benannt.',
-  coords: [8.5328, 52.0262], ...photo('bahnhofstrasse'),
-  sources: [{ title: 'Neue Westfälische · Weihnachtsmarkt 2025', url: 'https://www.nw.de/lokal/bielefeld/mitte/23899144_Bielefelder-Weihnachtsmarkt-2025-Staende-Termine-Oeffnungszeiten.html' }, marketing]
+  id: 'wm2025-bahnhofstr', name: 'Der Winzer', place: 'Bahnhofstraße',
+  wine: 'Glühwein', description: `Der Glühweinstand „Der Winzer“ in der Bahnhofstraße am Rand des Marktgebiets. ${list2026}`,
+  coords: [8.5328, 52.0262], ...photo('bahnhofstrasse'), sources: []
+ },
+ {
+  id: 'wm2026-kaiser', name: 'Jerome Kaiser', place: 'Stresemannstraße',
+  wine: 'Glühwein', description: `Glühweinstand von Jerome Kaiser in der Stresemannstraße, gleich neben dem Jahnplatz. ${list2026}`,
+  coords: [8.5345000, 52.0228500], ...noPhoto, sources: []
+ },
+ {
+  id: 'wm2025-lions', name: 'Lions Club', place: 'Obernstraße',
+  wine: 'Roter & weißer Glühwein', description: `Glühwein für den guten Zweck, 2026 in der Obernstraße (2025 noch am Alten Markt). 2025 gab es erstmals auch weißen Glühwein sowie alkoholfreien Claire de Lune. ${list2026}`,
+  coords: [8.5312000, 52.0201000], ...photo('lions'),
+  sources: [{ title: 'Lions Club Bielefeld Phoenix · November 2025', url: 'https://www.lions-phoenix.com/presse/2025/11/21/dieses-jahr-mit-berraschung-wir-haben-jetzt-auch-weien-glhwein' }, { title: 'Lions Bielefeld Sparrenberg · Saison 2025', url: 'https://www.lc-bi-sparrenberg.de/lions-bielefeld-sparrenberg/aktuelles/' }]
+ },
+ {
+  id: 'wm2026-wintersaeftchen', name: 'Wintersäftchen', place: 'Obernstraße',
+  wine: 'Heiße Säfte & Glühwein', description: `Ausschank „Wintersäftchen“ in der Obernstraße. ${list2026}`,
+  coords: [8.5306500, 52.0198300], ...noPhoto, sources: []
+ },
+ {
+  id: 'wm2026-wille-met', name: 'Wille Met', place: 'Obernstraße',
+  wine: 'Heißer Met', description: `Met-Stand von Wille in der Obernstraße, die Alternative zum Glühwein. ${list2026}`,
+  coords: [8.5301000, 52.0196000], ...noPhoto, sources: []
+ },
+ {
+  id: 'wm2025-almhuette', name: 'Krauses Almhütte', place: 'Bunnemannplatz',
+  wine: 'Glühwein, auch weißer', description: `Eine warme Almhütte zwischen Obernstraße und Bunnemannplatz, auch mit weißem Glühwein. ${list2026}`,
+  coords: [8.5295743, 52.0193913], ...photo('almhuette'), sources: [marketing]
+ },
+ {
+  id: 'wm2025-fels', name: 'Weihnachten unter dem Fels', place: 'Klosterplatz',
+  wine: 'Glühwein & Punsch', description: `Die Glühweinhütte im Weihnachtsmarkt-Areal am Klosterplatz, mit Lounge im Fels. ${list2026}`,
+  coords: [8.5285503, 52.0208272], ...photo('fels'),
+  sources: [{ title: 'Betreiber · Klosterplatz', url: 'https://www.weihnachtsmarkt-klosterplatz.de/' }]
  }
 ];
 export const legacyStands = [

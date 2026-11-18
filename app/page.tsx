@@ -555,8 +555,8 @@ export default function Home() {
               : <button type="button" className="link-btn" onClick={() => setAdminOpen(true)}><KeyRound size={13} /> Admin-Login</button>)}
           </div>
           <details className="sources">
-            <summary>Standliste 2025 & Quellen</summary>
-            <p>Belegte Auswahl, keine vollständige Beschickerliste. Preise und genaue Standpositionen sind nicht gesichert. Für 2026 müssen die Stopps neu geprüft werden.</p>
+            <summary>Standliste 2026 & Quellen</summary>
+            <p>Die Glühweinstände der Standliste 2026 für die Innenstadt. Markt vom 19.11. bis 30.12.2026, So bis Do 12 bis 21 Uhr, Fr/Sa 12 bis 22 Uhr. Preise und genaue Standpositionen sind nicht gesichert.</p>
             {stands.map(s => <div key={s.id}><strong>{s.name} · {s.place}</strong>{s.sources.map(src => <a key={src.url} href={src.url} target="_blank" rel="noreferrer">{src.title}<ArrowUpRight size={12} /></a>)}</div>)}
             <p>Karte: MapLibre, OpenFreeMap, OpenStreetMap. Bilder: eigene Illustrationen.</p>
           </details>

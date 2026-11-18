@@ -93,7 +93,7 @@ export default function StandSheet({ stand, reviews, ownId, nasenId, isCurrent, 
         </ol>
 
         <details className="sources">
-          <summary>Über diesen Stopp · Quellen 2025</summary>
+          <summary>Über diesen Stopp · Quellen</summary>
           <p>{stand.description}</p>
           <p>Preise vor Ort prüfen. Die Markierung zeigt den Ortsbereich, keine vermessene Standposition.</p>
           {stand.sources.map(s => <a key={s.url} href={s.url} target="_blank" rel="noreferrer">{s.title}<ArrowUpRight size={13} /></a>)}
