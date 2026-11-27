@@ -22,3 +22,19 @@
 .onboard-photo { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 22px; box-shadow: 0 0 0 1px var(--line); }
 .onboard-hero .onboard-logo { position: relative; margin-top: -70px; }
 .onboard-credit { position: absolute; top: 8px; right: 8px; padding: 3px 8px; border-radius: 999px; background: rgba(10, 6, 10, .55); color: rgba(255, 255, 255, .85); font-size: 10.5px; backdrop-filter: blur(6px); }
+.onboard-note { margin: 0; font-size: 14px; line-height: 1.45; color: var(--muted); padding: 12px 14px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); }
+.onboard-note b { color: var(--ink); }
+.onboard-label { font-size: 14px; font-weight: 600; color: var(--muted); margin-bottom: -8px; }
+.onboard-input.code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em; text-transform: uppercase; }
+.onboard-choices { display: grid; gap: 10px; }
+.onboard-choice { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 76px; padding: 14px 16px; text-align: left; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); color: var(--ink); font: inherit; cursor: pointer; }
+.onboard-choice:hover, .onboard-choice:focus-visible { border-color: var(--amber); }
+.onboard-choice > span:nth-child(2) { flex: 1; display: grid; gap: 2px; }
+.onboard-choice b { font-size: 17px; font-weight: 650; }
+.onboard-choice small { color: var(--muted); font-size: 14px; line-height: 1.35; }
+.onboard-choice > svg { color: var(--muted); flex: none; }
+.onboard-choice-icon { flex: none; width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--amber); color: var(--amber-ink); }
+.onboard-code-card { display: grid; justify-items: center; gap: 4px; padding: 18px; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); }
+.onboard-code-card small { color: var(--muted); font-size: 13px; }
+.onboard-code-card strong { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 26px; letter-spacing: .06em; }
+.onboard .link-btn.back { display: inline-flex; align-items: center; gap: 4px; }

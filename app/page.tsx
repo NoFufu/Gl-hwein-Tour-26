@@ -12,7 +12,7 @@ import NoseBadge from '../components/ui/NoseBadge';
 import NoseSheet from '../components/NoseSheet';
 import StyleSheet from '../components/StyleSheet';
 import Intro from '../components/Intro';
-import Onboarding from '../components/Onboarding';
+import Onboarding, { type NewGroup } from '../components/Onboarding';
 import PaperArch from '../components/PaperArch';
 import { exportBackup, exportCsv } from '../lib/export';
 import { applyTheme, CUP_KEY, DEFAULT_THEME, isCupChoice, THEME_KEY, themeById, type CupChoice } from '../lib/themes';
@@ -23,7 +23,7 @@ import SpotlightCard from '../components/ui/SpotlightCard';
 import Stars from '../components/ui/Stars';
 import { formatScore, setStands, stands, stopNumber, type Rating, type Stand } from '../lib/data';
 import type { RouteRequest } from '../components/TourMap';
-import { average, createStore, explainError, loadAdminKey, saveAdminKey, ADMIN_PROFILE, type GroupEvent, type GroupMeta, inviteLink, liveConfigured, loadGroupCode, loadProfile, newGroupCode, normalizeCode, reviewId, saveGroupCode, saveProfile, type Profile, type Review, type ReviewStore, type SyncStatus } from '../lib/reviews';
+import { average, createGroupRecord, createStore, explainError, groupExists, loadAdminKey, saveAdminKey, ADMIN_PROFILE, HOME_GROUP, type GroupEvent, type GroupMeta, inviteLink, liveConfigured, loadGroupCode, loadProfile, newGroupCode, normalizeCode, reviewId, saveGroupCode, saveProfile, type Profile, type Review, type ReviewStore, type SyncStatus } from '../lib/reviews';
 
 const TourMap = dynamic(() => import('../components/TourMap'), { ssr: false, loading: () => <div className="map-skeleton">Karte wird geladen …</div> });
 const BackgroundScene = dynamic(() => import('../components/BackgroundScene'), { ssr: false });
@@ -92,6 +92,7 @@ export default function Home() {
   const [noseOpen, setNoseOpen] = useState(false);
   const [intro, setIntro] = useState(false);
   const [onboard, setOnboard] = useState(false);
+  const [invited, setInvited] = useState('');
   const [slogan, setSlogan] = useState(0);
   const [flashLive, setFlashLive] = useState(false);
   const wasOnline = useRef(false);
@@ -161,8 +162,9 @@ export default function Home() {
     (async () => {
       const p = await loadProfile();
       setProfile(p); profileRef.current = p;
-      // Neu hier: Einrichtung (Home-Bildschirm, Name, Design) statt Start-Animation und Namensdialog.
+      // Neu hier: Einrichtung (Home-Bildschirm, Name, Gruppe) statt Start-Animation und Namensdialog.
       const isNew = !p.name.trim();
+      const fromLink = new URLSearchParams(location.hash.slice(1)).get('g');
       if (isNew) setOnboard(true);
       try {
         const t = localStorage.getItem(THEME_KEY);
@@ -176,9 +178,16 @@ export default function Home() {
       try { if (!isNew && !localStorage.getItem(INTRO_KEY) && !matchMedia('(prefers-reduced-motion: reduce)').matches) setIntro(true); } catch {}
       const c = loadCurrent();
       if (c) { setCurrent(c); setSelected(c); }
-      const code = loadGroupCode();
+      let code = loadGroupCode();
+      if (isNew) {
+        // Gruppe wählt man erst in der Einrichtung. Bis dahin vorläufig verbinden (für den Admin-Code im Namensfeld).
+        setInvited(fromLink ? normalizeCode(fromLink) : '');
+        code = code || HOME_GROUP;
+      } else if (!code) {
+        // Wer schon dabei war, bleibt in Levis Runde.
+        code = HOME_GROUP; saveGroupCode(code);
+      }
       setGroup(code);
-      if (liveConfigured() && !code) { setGate(true); return; }
       await connect(code);
     })();
     return () => { unsubscribeRef.current(); clearTimeout(toastTimer.current); };
@@ -187,14 +196,35 @@ export default function Home() {
   async function joinGroup(code: string) {
     const c = normalizeCode(code);
     if (c.length < 6) return;
+    if (await groupExists(c) === false) return notify('Diese Gruppe gibt es nicht. Prüf den Code nochmal.');
     saveGroupCode(c); setGroup(c); setGate(false);
     await connect(c);
   }
 
   async function foundGroup() {
+    const r = await createGroup();
+    if (typeof r === 'string') return notify(r);
+    setGate(false);
+    notify(`Gruppe ${r.code} steht. Dein Admin-Code: ${r.adminCode}`);
+    shareInvite(r.code);
+  }
+  /** Neue Gruppe anlegen: wer sie erstellt, wird mit einem zufälligen Admin-Code ihr Admin. */
+  async function createGroup(): Promise<NewGroup | string> {
     const code = newGroupCode();
-    shareInvite(code); // vor dem ersten await, damit das Teilen-Menü als Nutzeraktion zählt
-    await joinGroup(code);
+    const adminCode = String(100000 + (crypto.getRandomValues(new Uint32Array(1))[0] % 900000));
+    try { await createGroupRecord(code, adminCode); }
+    catch (e) { return e instanceof Error ? e.message : 'Hat nicht geklappt.'; }
+    saveGroupCode(code); saveAdminKey(code, adminCode); setGroup(code);
+    await connect(code);
+    return { code, adminCode };
+  }
+  /** Bestehender Gruppe beitreten. Gibt es den Code nicht, kommt ein Hinweis statt einer leeren Gruppe. */
+  async function joinFromOnboarding(raw: string): Promise<string | void> {
+    const c = normalizeCode(raw);
+    if (c.length < 6) return 'Der Gruppencode ist zu kurz.';
+    if (await groupExists(c) === false) return 'Diese Gruppe gibt es nicht. Prüf den Code nochmal.';
+    saveGroupCode(c); setGroup(c);
+    await connect(c);
   }
 
   useEffect(() => { if (lightbox) photoDialog.current?.showModal(); else photoDialog.current?.close(); }, [lightbox]);
@@ -279,7 +309,8 @@ export default function Home() {
       try { await store.claimAdmin(key); ok = true; } catch (e) { return e instanceof Error ? e.message : 'Hat nicht geklappt.'; }
     }
     if (!ok) return 'Dieser Admin-Code passt nicht.';
-    const p = ADMIN_PROFILE;
+    // In Levis Runde ist der Admin immer „Levi“, in eigenen Gruppen bleibt der eigene Name.
+    const p = group === HOME_GROUP ? ADMIN_PROFILE : { ...profileRef.current, name: profileRef.current.name.trim() || 'Admin' };
     setProfile(p); profileRef.current = p; saveProfile(p);
     saveAdminKey(group, key); setAdminDraft('');
     try { localStorage.setItem(GUIDE_KEY, '1'); localStorage.setItem(INTRO_KEY, '1'); } catch {}
@@ -347,16 +378,23 @@ export default function Home() {
     next?.();
   }
   /** Name aus der Einrichtung. Eine Zahl statt Name ist der Admin-Code. */
-  async function nameFromOnboarding(name: string): Promise<string | void> {
-    if (/^\d{4,}$/.test(name)) return loginAdmin(name, false);
-    const p = { ...profile, name };
+  async function nameFromOnboarding(name: string): Promise<'admin' | string | void> {
+    if (/^\d{4,}$/.test(name)) {
+      // Admin-Code (Levi): die Gruppe, mit der die App gerade verbunden ist, steht damit fest.
+      const problem = await loginAdmin(name, false);
+      if (problem) return problem;
+      saveGroupCode(group);
+      return 'admin';
+    }
+    const p = { ...profileRef.current, name };
     setProfile(p); profileRef.current = p; saveProfile(p);
   }
   function finishOnboarding() {
     setOnboard(false);
     try { localStorage.setItem(GUIDE_KEY, '1'); localStorage.setItem(INTRO_KEY, '1'); } catch {}
-    if (isAdmin) setView('admin');
-    notify(isAdmin ? 'Alles bereit. Unter „Admin“ kannst du die Gruppe vorbereiten.' : `Willkommen in der Runde, ${profile.name}!`);
+    const admin = profileRef.current.id === ADMIN_PROFILE.id;
+    if (admin) setView('admin');
+    notify(admin ? 'Alles bereit. Unter „Admin“ kannst du die Gruppe vorbereiten.' : `Willkommen in der Runde, ${profileRef.current.name}!`);
   }
   function changeView(v: View) { setView(v); window.scrollTo({ top: 0, behavior: 'instant' }); }
   const share = () => shareInvite(group);
@@ -374,7 +412,7 @@ export default function Home() {
       <a className="skip-link" href="#inhalt">Zum Inhalt springen</a>
       <BackgroundScene palette={themeById(theme).scene} />
       {intro && <Intro slogan={slogans[slogan]} onDone={finishIntro} />}
-      {onboard && <Onboarding theme={theme} onTheme={chooseTheme} cup={cup} onCup={chooseCup} onName={nameFromOnboarding} onDone={finishOnboarding} />}
+      {onboard && <Onboarding invited={invited} suggested={HOME_GROUP} onName={nameFromOnboarding} onJoin={joinFromOnboarding} onCreate={createGroup} onShare={shareInvite} onDone={finishOnboarding} />}
       {(syncProblem || flashLive) && !gate && (
         <button type="button" className={`status-pill ${syncProblem ? 'warn' : 'ok'}`} onClick={() => changeView('group')} role="status">
           {syncProblem ? <WifiOff size={14} /> : <Wifi size={14} />}
@@ -549,6 +587,7 @@ export default function Home() {
           </section>
           <div className="group-links">
             <button type="button" className="link-btn" onClick={() => { setNameDraft(profile.name); setRenaming(true); setAskName(() => () => {}); }}>Du bist als {profile.name || 'Gast'} dabei · Namen ändern</button>
+            {live && <button type="button" className="link-btn" onClick={() => { setCodeDraft(''); setGate(true); window.scrollTo({ top: 0 }); }}>Andere Gruppe beitreten oder erstellen</button>}
             <button type="button" className="link-btn" onClick={() => setIntro(true)}>Start-Animation nochmal ansehen</button>
             {live && group && !isAdmin && (adminOpen
               ? <form className="admin-login" onSubmit={enterAdmin}><input value={adminDraft} onChange={e => setAdminDraft(e.target.value.toUpperCase())} placeholder={hasAdmin === false ? 'Code festlegen' : 'Admin-Code'} inputMode="numeric" autoComplete="off" autoCapitalize="characters" spellCheck={false} aria-label="Admin-Code" autoFocus /><button type="submit" className="btn ghost small" disabled={adminDraft.trim().length < 4}>Freischalten</button></form>

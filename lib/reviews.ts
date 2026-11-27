@@ -69,9 +69,7 @@ export function loadGroupCode(): string {
     history.replaceState(null, '', location.pathname + location.search);
     return normalizeCode(fromLink);
   }
-  // Es gibt eine feste Gruppe für alle (Levis Runde). Alte Test-Gruppen auf dem Handy werden damit abgelöst.
-  saveGroupCode(HOME_GROUP);
-  return HOME_GROUP;
+  try { return normalizeCode(localStorage.getItem(GROUP_KEY) || ''); } catch { return ''; }
 }
 /** Die eine Gruppe der Tour. Levi ist dort Admin. */
 export const HOME_GROUP = 'LEVI-TOUR26';
@@ -337,7 +335,7 @@ async function liveStore(url: string, key: string, group: string, profile: () =>
     flush,
 
     isAdmin,
-    async hasAdmin() { const { data } = await db.rpc('group_has_admin'); return data === true; },
+    async hasAdmin() { const { data, error } = await db.rpc('group_has_admin').abortSignal(timeout(8000)); if (error) throw error; return data === true; },
     async claimAdmin(code) {
       const { error } = await client(code).from('groups').insert({ code: group, admin_hash: await sha256(code) });
       if (error) throw Error(/duplicate|23505/i.test(error.message) ? 'Diese Gruppe hat schon einen Admin. Frag nach dem Admin-Code.' : explainError(error));
@@ -454,6 +452,26 @@ export function newAdminKey() {
 const ADMIN_KEY = (group: string) => `glueh26-admin:${group}`;
 export function loadAdminKey(group: string) { try { return localStorage.getItem(ADMIN_KEY(group)) || ''; } catch { return ''; } }
 export function saveAdminKey(group: string, key: string) { try { if (key) localStorage.setItem(ADMIN_KEY(group), key); else localStorage.removeItem(ADMIN_KEY(group)); } catch {} }
+
+/** Kurzer Datenbank-Zugang nur für eine Gruppe, ohne Echtzeit-Kanal (für Beitreten und Erstellen). */
+async function groupClient(group: string, adminKey = '') {
+  const { createClient } = await import('@supabase/supabase-js');
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { auth: { persistSession: false }, global: { headers: { 'x-group-code': group, ...(adminKey ? { 'x-admin-key': adminKey } : {}) } } });
+}
+/** Gibt es die Gruppe? null heißt: gerade nicht prüfbar (offline). */
+export async function groupExists(group: string): Promise<boolean | null> {
+  if (!liveConfigured()) return null;
+  try {
+    const { data, error } = await (await groupClient(group)).rpc('group_has_admin').abortSignal(timeout(8000));
+    return error ? null : data === true;
+  } catch { return null; }
+}
+/** Neue Gruppe anlegen. Wer sie anlegt, legt damit auch den Admin-Code fest. */
+export async function createGroupRecord(group: string, adminKey: string): Promise<void> {
+  if (!liveConfigured()) return;
+  const { error } = await (await groupClient(group, adminKey)).from('groups').insert({ code: group, admin_hash: await sha256(adminKey) }).abortSignal(timeout(10000));
+  if (error) throw Error(/fetch|network|abort|timeout/i.test(error.message) ? 'Keine Verbindung. Versuch es gleich nochmal.' : explainError(error));
+}
 
 export const liveConfigured = () => Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
