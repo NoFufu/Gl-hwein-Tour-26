@@ -18,7 +18,6 @@ const photo = (name: string) => ({ image: asset(`/fotos/${name}.jpg`), thumb: as
 const marketing: StandSource = { title: 'Bielefeld Marketing · 04.11.2025', url: 'https://www.bielefeld-marketing.de/pressemeldung/bielefeld-laedt-weihnachtsmarkt' };
 
 const list2026 = 'Laut Standliste 2026 für die Bielefelder Innenstadt (Markt vom 19.11. bis 30.12.2026, So bis Do 12 bis 21 Uhr, Fr/Sa 12 bis 22 Uhr).';
-const noPhoto = { image: asset('/illustrations/markt-abend.svg') };
 
 // Season IDs keep ratings of the former invented stands separate. Stands that already
 // existed in 2025 keep their wm2025 id so their ratings stay attached.
@@ -32,12 +31,12 @@ export const defaultStands: Stand[] = [
  {
   id: 'wm2026-duenhoelter', name: 'Dünhölter Weinhandel', place: 'Alter Markt',
   wine: 'Glühwein', description: `Der Glühweinstand des Weinhandels Dünhölter am Alten Markt. ${list2026}`,
-  coords: [8.5325200, 52.0207300], ...noPhoto, sources: []
+  coords: [8.5325200, 52.0207300], ...photo('duenhoelter'), sources: []
  },
  {
   id: 'wm2026-gluehwuermchen', name: 'Glühwürmchen', place: 'Alter Markt',
   wine: 'Glühwein', description: `Glühweinstand am Alten Markt. ${list2026}`,
-  coords: [8.5320300, 52.0204900], ...noPhoto, sources: []
+  coords: [8.5320300, 52.0204900], ...photo('gluehwuermchen'), sources: []
  },
  {
   id: 'wm2025-nikolaus', name: 'Haus vom Nikolaus', place: 'Altstädter Kirchpark am Leineweber',
@@ -53,7 +52,7 @@ export const defaultStands: Stand[] = [
  {
   id: 'wm2026-knigge', name: 'Café Knigge', place: 'Niedernstraße & Bahnhofstraße',
   wine: 'Glühwein', description: `Café Knigge schenkt an zwei Stellen aus: in der Niedernstraße und in der Bahnhofstraße. Der Kartenpunkt liegt in der Niedernstraße. ${list2026}`,
-  coords: [8.5321500, 52.0226500], ...noPhoto, sources: []
+  coords: [8.5321500, 52.0226500], ...photo('knigge'), sources: []
  },
  {
   id: 'wm2025-bahnhofstr', name: 'Der Winzer', place: 'Bahnhofstraße',
@@ -63,7 +62,7 @@ export const defaultStands: Stand[] = [
  {
   id: 'wm2026-kaiser', name: 'Jerome Kaiser', place: 'Stresemannstraße',
   wine: 'Glühwein', description: `Glühweinstand von Jerome Kaiser in der Stresemannstraße, gleich neben dem Jahnplatz. ${list2026}`,
-  coords: [8.5345000, 52.0228500], ...noPhoto, sources: []
+  coords: [8.5345000, 52.0228500], ...photo('kaiser'), sources: []
  },
  {
   id: 'wm2025-lions', name: 'Lions Club', place: 'Obernstraße',
@@ -74,12 +73,12 @@ export const defaultStands: Stand[] = [
  {
   id: 'wm2026-wintersaeftchen', name: 'Wintersäftchen', place: 'Obernstraße',
   wine: 'Heiße Säfte & Glühwein', description: `Ausschank „Wintersäftchen“ in der Obernstraße. ${list2026}`,
-  coords: [8.5306500, 52.0198300], ...noPhoto, sources: []
+  coords: [8.5306500, 52.0198300], ...photo('wintersaeftchen'), sources: []
  },
  {
   id: 'wm2026-wille-met', name: 'Wille Met', place: 'Obernstraße',
   wine: 'Heißer Met', description: `Met-Stand von Wille in der Obernstraße, die Alternative zum Glühwein. ${list2026}`,
-  coords: [8.5301000, 52.0196000], ...noPhoto, sources: []
+  coords: [8.5301000, 52.0196000], ...photo('wille-met'), sources: []
  },
  {
   id: 'wm2025-almhuette', name: 'Krauses Almhütte', place: 'Bunnemannplatz',
