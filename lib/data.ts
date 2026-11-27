@@ -44,6 +44,12 @@ export const defaultStands: Stand[] = [
   coords: [8.5321475, 52.0210376], ...photo('nikolaus'), sources: [marketing]
  },
  {
+  id: 'wm2026-feuerzangenbowle', name: 'Feuerzangenbowle', place: 'Altstädter Kirchplatz',
+  wine: 'Feuerzangenbowle & heiße Schokolade', description: 'Der Feuerzangenbowle-Stand von Victoria Schneider auf dem Altstädter Kirchplatz an der Nicolaikirche, mit heißer Schokolade als Alternative. Laut Westfalen-Blatt gab es 2024 dort zusätzlich eine „Heiße Dubai-Schokolade“ für 5 Euro. Das Foto zeigt die Altstädter Kirche und den Alten Markt von oben.',
+  coords: [8.5326500, 52.0214500], ...photo('feuerzangenbowle'),
+  sources: [{ title: 'Westfalen-Blatt · 01.12.2024', url: 'https://www.westfalen-blatt.de/owl/bielefeld/bielefelder-weihnachtsmarkt-am-puls-der-zeit-3199676' }]
+ },
+ {
   id: 'wm2025-gluehbar', name: 'GlühBar', place: 'Niedernstraße',
   wine: 'Glühwein & mehr', description: `Die GlühBar in der Niedernstraße zwischen Alter Markt und Jahnplatz. ${list2026}`,
   coords: [8.5317787, 52.0222174], ...photo('gluehbar'),
